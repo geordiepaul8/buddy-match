@@ -1,0 +1,36 @@
+{
+  "name": "backend-2",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon ./index.js",
+    "angstart": "npm run ng serve",
+    "test": "mocha 'tests/**/*.js'",
+    "quality": "npm run quality:coverage",
+    "quality:coverage": "nyc mocha 'tests/**/*.js'",
+    "security": "npm run security:audit && npm run security:outdated",
+    "security:audit": "check-audit --json --registry 'https://registry.npmjs.org/' | node -e 'a=JSON.parse(fs.readFileSync(\"/dev/stdin\",\"utf-8\")).metadata.vulnerabilities;process.exit(a.high+a.critical);'",
+    "security:outdated": "npm outdated"
+  },
+  "author": "Paul Costigan",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "chai": "^4.2.0",
+    "express": "^4.17.1",
+    "mocha": "^6.1.4",
+    "mongodb": "^3.2.7",
+    "mongoose": "^5.6.1",
+    "mongoose-timestamp": "^0.6.0",
+    "nodemon": "^1.19.1",
+    "npm": "^6.10.1",
+    "pino": "^5.12.6",
+    "pino-pretty": "^3.2.0",
+    "request": "^2.88.0"
+  },
+  "devDependencies": {
+    "eslint": "^6.1.0",
+    "nyc": "^14.1.1"
+  }
+}

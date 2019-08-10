@@ -1,0 +1,36 @@
+<div class="container-fluid">
+    <h1>{{ loggedInUser?.name}} Aged: {{ loggedInUser?.age }}</h1>
+
+    <h5>Login Details</h5>
+    <ul>
+        <li>email: {{loggedInUser?.loginCredentials?.email}}</li>
+        <li>password: {{loggedInUser?.loginCredentials?.password}}</li>
+    </ul>
+
+    <h5>Location Details</h5>
+    <ul>
+        <li>Position: {{loggedInUser?.location?.latitude }} / {{loggedInUser?.location?.longitude }}</li>
+        <li>City: {{loggedInUser?.location?.city }}</li>
+    </ul>
+
+    <h5>Interests</h5>
+    <ul>
+        <li *ngFor="let interest of  loggedInUser?.interests">{{ interest.name }}</li>
+    </ul>
+
+    <h5>matches</h5>
+    <ul>
+        <li *ngFor="let match of  loggedInUser?.matches">{{match?.users[1]}} - [{{match?.compatibilityScore}}]</li>
+    </ul>
+
+
+    <h5>Your Settings:</h5>
+
+    <ul>
+        <li>Want to be searched? Y/N</li>
+        <li>Distance for companion match: Default is 50nm (same country only)</li>
+        <li>Distance that searchees can look for you</li>
+        <li>notifications on events that match you in your location?</li>
+    </ul>
+
+</div>

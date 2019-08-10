@@ -1,0 +1,492 @@
+openapi: 3.0.1
+info:
+  title: Compatibiilties API
+  description: A compatibilities API to serve the Angular front-end for matching like-minded people
+  contact:
+    name: Paul Costigan
+    email: email@email.com
+  license:
+    name: ISC
+    url: "https://opensource.org/licenses/ISC"
+  version: 1.0.0
+servers:
+- url: http://localhost:3000/v1
+  variables:
+    environment: 
+      default: localhost
+      description: run the service in the local environment
+    port:
+      default: '3000'
+      description: the port to be served in the environment
+tags:
+- name: User
+  description: user interactions
+- name: Interests
+  description: interest interactions
+- name: Match
+  description: match interactions
+- name: Actuator
+  description: Actuator Endpoints
+paths:
+  /user:
+    get:
+      tags:
+        - User
+      summary: get all user information
+      description: This endpoint will retrieve the user info
+      operationId: getUser
+      deprecated: false
+      parameters:
+      - in: path
+        name: userId
+        description: user id
+        required: true
+        allowEmptyValue: false
+        schema:
+          pattern: /^[a-f\d]{24}$/i
+          type: string
+      # - in: query
+      #   name: interests
+      #   schema:
+      #     type: string
+      #   description: "Select true to enhance the interests model in the response body"
+       
+      responses:
+        200:
+          description: Search executed successfully. If results were found they are
+            returned as a list. If no results are found then an empty list is returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseObject'
+              example:
+                message: "successfully retrieved user profile for: 5d30cc07ef01bfcd6a089338"
+                response:
+                  _id:  "5d30cc07ef01bfcd6a089338"
+                  name: "John Smith"
+                  age: 30
+                  matches: []
+                  interests: []
+                  createdAt: "2019-07-18T19:44:07.672Z"
+                  updatedAt: "2019-07-18T19:44:07.672Z"
+                  __v: 0
+        422:
+          description: Invalide query parameter, incoreectly formatted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorObject'
+              example:
+                message: "invalid userId query parameter supplied: 5d30cc07ef01bfcd6a089338"
+                error: {}
+                  
+        400:
+          description: Query parameter incorrectly formatted or missing.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorObject'
+              example:
+                message: "there was an error with finding the user: 5d30cc07ef01bfcd6a089338, please try again"
+                error: "the error stack"
+        404:
+          description: Query parameter incorrectly formatted or missing.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseObject'
+              example:
+                message: "there is no profile for user: 5d30cc07ef01bfcd6a089338"
+                response: {}
+        500:
+          description: Error while processing the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorObject'
+              example:
+                error: "there was a problem contacting the server, please try again"
+    post:
+      tags:
+        - User
+      summary: submits a new user
+      description: This endpoint will retrieve the user info
+      operationId: postUser
+      deprecated: false
+      requestBody:
+        description: request
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserInputModel'
+        required: true
+      responses:
+        201:
+          description: Search executed successfully. If results were found they are
+            returned as a list. If no results are found then an empty list is returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseObject'
+              example:
+                message: "user created: 5d30cc07ef01bfcd6a089338, name: John Doe"
+                response:
+                  _id:  "5d30cc07ef01bfcd6a089338"
+                  name: "John Doe"
+                  age: 30
+                  matches: []
+                  interests: []
+                  createdAt: "2019-07-18T19:44:07.672Z"
+                  updatedAt: "2019-07-18T19:44:07.672Z"
+                  __v: 0
+        422:
+          description: Invalide body data, either incorrectly formatted or missing
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorObject'
+              example:
+                message: "invalid body data supplied, name: null, age 30"
+                error: {}
+       
+  /lookup/uprn/{uprn}:
+    get:
+      tags:
+        - Address Lookup
+      summary: /uprn
+      description: This endpoint will retrieve an address for a given uprn
+      operationId: getAddressByUprnUsingGET
+      deprecated: false
+      parameters:
+      - name: uprn
+        in: path
+        description: uprn
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        200:
+          description: Search executed successfully. If a result is found, an Address
+            object will be returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UprnLookupResponse'
+        400:
+          description: Query parameter incorrectly formatted or missing.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorObject'
+        404:
+          description: Not Found
+        500:
+          description: Error while processing the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorObject'
+  /match/address:
+    post:
+      tags:
+      - Address Matcher
+      summary: /address
+      description: This endpoint will attempt to find a PAF formatted address from
+        an unformatted address. To exclude business address include the boolean paramter
+        excludeBusiness
+      operationId: matchUsingPOST
+      deprecated: false
+      parameters:
+      - name: excludeBusiness
+        in: query
+        description: excludeBusiness
+        required: false
+        schema:
+          type: boolean
+      requestBody:
+        description: request
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UnformattedAddress'
+        required: true
+      responses:
+        200:
+          description: Search executed successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AddressMatchResponse'
+        400:
+          description: Query parameter incorrectly formatted or missing.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorObject'
+        500:
+          description: Error while processing the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorObject'
+  /actuator/health:
+    get:
+      tags:
+        - Actuator
+      summary: /health
+      description: Basic health check
+      operationId: getHealthUsingGET
+      deprecated: false
+      responses:
+        200:
+          description: Health response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                    - UP
+        500:
+          description: Error while processing the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorObject'
+  /actuator/info:
+    get:
+      tags:
+        - Actuator
+      summary: /info
+      description: Basic metrics
+      operationId: getInfoUsingGET
+      deprecated: false
+      responses:
+        200:
+          description: Info response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  app:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                        example: location-servoce
+                      description:
+                        type: string
+                        example: location-service
+                      version:
+                        type: string
+                        example: "2.3.1"
+                      java:
+                        type: object
+                        properties:
+                          version: 
+                            type: string
+                            example: "11.0.2"
+        500:
+          description: Error while processing the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorObject'
+components:
+  schemas:
+    ResponseObject:
+      type: object
+      properties:
+        message:
+          type: string
+        response:
+          # oneOf
+          $ref: '#/components/schemas/UserModel'
+    UserInputModel:
+      type: object
+      properties:
+        name: 
+          type: string
+        age: 
+          type: integer
+      example:
+        name: "John Smith"
+        age: 30
+    UserModel:
+      type: object
+      properties:
+        _id:
+          type: string
+        name:
+          type: string
+        age:
+          type: integer
+        interests:
+          type: string
+        matches:
+          type: string
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+        __v:
+          type: integer
+    ErrorObject:
+      type: object
+      properties:
+        message:
+          type: string
+        response:
+          type: string
+          
+        
+    ErrorObject1:
+      type: object
+      properties:
+        httpStatusCode:
+          type: integer
+          enum:
+            - 400
+            - 404
+            - 405
+            - 406
+            - 415
+            - 500
+            - 503
+        httpStatus:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        trace:
+          type: string
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              message:
+                type: string
+              path:
+                type: string
+              errorCode:
+                  description: >
+                    The error code definition can be found in the project Readme.md file
+                    * `1000` - Client Error
+                    * `1001` - Malformed JSON. Unable to parse
+                    * `1002` - Validation error
+                    * `1200` - Internal Server Error
+                    * `1202` - Internal Server Error
+                    * `1203` - Internal Server Error
+                  type: integer
+                  enum:
+                    - 1000
+                    - 1001
+                    - 1002
+                    - 1200
+                    - 1202
+                    - 1203
+              detailedMessage:
+                description: "Optional detailed message (likely used for development purposes)"
+                type: string
+    Address:
+      title: Address
+      type: object
+      properties:
+        buildingName:
+          type: string
+        buildingNumber:
+          type: string
+        completeAddressLine:
+          type: string
+        departmentName:
+          type: string
+        dependentLocality:
+          type: string
+        dependentThoroughfareName:
+          type: string
+        doubleDependentLocality:
+          type: string
+        laOrganisationName:
+          type: string
+        locality:
+          type: string
+        metaData:
+          $ref: '#/components/schemas/MetaData'
+        organisationName:
+          type: string
+        parentUprn:
+          type: integer
+          format: int64
+        poBoxNumber:
+          type: string
+        postTown:
+          type: string
+        postcode:
+          type: string
+        subBuildingName:
+          type: string
+        thoroughfareName:
+          type: string
+        townName:
+          type: string
+        udprn:
+          type: integer
+          format: int64
+        uprn:
+          type: integer
+          format: int64
+    AddressMatchResponse:
+      title: AddressMatchResponse
+      type: object
+      properties:
+        address:
+          $ref: '#/components/schemas/Address'
+        msg:
+          type: string
+    UprnLookupResponse:
+      title: UprnLookupResponse
+      type: object
+      properties:
+        address:
+          $ref: '#/components/schemas/Address'
+        msg:
+          type: string
+    MetaData:
+      title: MetaData
+      type: object
+      properties:
+        businessAddress:
+          type: boolean
+        businessType:
+          description: "This is a string returned that corresponds to the SCat Code, see https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=2&ved=2ahUKEwj49qeelIfjAhWFmFwKHUw4DcIQFjABegQIAxAC&url=https%3A%2F%2Fwww.ordnancesurvey.co.uk%2Fdocs%2Fsupport%2Fvoa-primary-description-scat-lookup.xlsx&usg=AOvVaw0qDteXg6hmQge1R337rBc- for the list of codes and associated business types"
+          type: string
+        country:
+          type: string
+    UnformattedAddress:
+      title: UnformattedAddress
+      type: object
+      properties:
+        addressLine1:
+          type: string
+          description: AddressDBModel line 1
+        addressLine2:
+          type: string
+          description: AddressDBModel line 2
+        addressLine3:
+          type: string
+          description: AddressDBModel line 3
+        addressLine4:
+          type: string
+          description: AddressDBModel line 4
+        addressLine5:
+          type: string
+          description: AddressDBModel line 5
+        addressPostcode:
+          type: string
+          description: Postcode
+      description: The unformatted address request model
