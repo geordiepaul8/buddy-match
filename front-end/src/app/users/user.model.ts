@@ -13,6 +13,7 @@ export class User {
 class LoginCredentials {
 	email: string;
 	password: string;
+	isLoggedIn: boolean;
 }
 
 class Location {

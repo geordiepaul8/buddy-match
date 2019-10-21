@@ -7,12 +7,18 @@ import { AppComponent } from './app.component';
 import { FormsModule } from '@angular/forms';
 
 
-import { UserListComponent } from './users/user-list/user-list.component';
+
+
 import { UserService } from './users/users.service';
+import { InterestService } from './interests/interest-service';
+
 import { NavbarComponent } from './navbar/navbar.component';
 import { UserProfileComponent } from './users/user-profile/user-profile.component';
 import { UserProfileMatchesComponent } from './users/user-profile-matches/user-profile-matches.component';
 import { UserRegisterComponent } from './users/user-register/user-register.component';
+import { UserListComponent } from './users/user-list/user-list.component';
+
+import { InterestListComponent } from './interests/interest-list/interest-list.component';
 
 @NgModule({
 	declarations: [
@@ -21,7 +27,8 @@ import { UserRegisterComponent } from './users/user-register/user-register.compo
 		NavbarComponent,
 		UserProfileComponent,
 		UserProfileMatchesComponent,
-		UserRegisterComponent
+		UserRegisterComponent,
+		InterestListComponent
 	],
 	imports: [
 		BrowserModule,
@@ -29,7 +36,7 @@ import { UserRegisterComponent } from './users/user-register/user-register.compo
 		HttpClientModule,
 		FormsModule
 	],
-	providers: [UserService],
+	providers: [UserService, InterestService],
 	bootstrap: [AppComponent]
 })
 export class AppModule { }

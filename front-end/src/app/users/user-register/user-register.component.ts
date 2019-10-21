@@ -14,23 +14,26 @@ export class UserRegisterComponent implements OnInit {
 	password: string;
 	age: number;
 	name: string;
+	isLoggedIn: false;
+	latitude: string;
+	longitude: string;
 
 	constructor(private userService: UserService) { }
 
-	ngOnInit() {
-	}
+	ngOnInit() {}
 
+	registerNewUser(userForm) {
 
-
-	registerNewUser() {
+		console.log(userForm.value)
 
 		this.newUser = {
 			_id: null,
-			name: this.name,
-			age: this.age,
+			name: userForm.value.name,
+			age: userForm.value.age,
 			loginCredentials: {
-				email: this.email,
-				password: this.password
+				email: userForm.value.email,
+				password: userForm.value.password,
+				isLoggedIn: userForm.value.isLoggedIn
 			},
 			location: {
 				latitude: 123,

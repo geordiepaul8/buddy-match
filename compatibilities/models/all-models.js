@@ -32,7 +32,8 @@ const userSchema = mongoose.Schema({
     email: {
       type: String
     },
-    password: String
+    password: String,
+    isLoggedIn: Boolean
   }
   
 });

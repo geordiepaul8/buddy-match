@@ -24,6 +24,17 @@ module.exports = {
   },
 
 /*
+*   Login a user
+*/
+
+  loginUser: function loginUser(userId) {
+    const query = {_id : userId};
+    const update = { $set: { 'logincredentials.isLoggedIn' : true } };
+    const options = {new: true, upsert: true};
+    return User.findOneAndUpdate(query, update, options);
+  },
+
+/*
 **  ${query}      example : { _id: "1234"  }
 **  ${payload}    exmaple : { $set : { matches: [1, 2] } }                    - overwrite the array
 **                    or  : { $set : { matches: [1, 2], name: "Paul" } }      - overwrite the array and name fields

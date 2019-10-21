@@ -44,6 +44,36 @@ function validateUserBody(req, res, next) {
   logger.info(`validateUserBody: `)
   logger.info(req.body)
 
+  if(!(req.body.location.longitude || req.body.location.latitude)) {
+    logger.error(`invalid location data supplied, latitude: ${req.body.location.latitude}, longitude: ${req.body.location.longitude}`);
+    res.status(422).json({ 
+      message: `invalid location data supplied, latitude: ${req.body.location.latitude}, longitude: ${req.body.location.longitude}`,
+      error: {}
+    });
+    return;
+  } else {
+    req.body.location = {
+      latitude: req.body.location.latitude,
+      longitude: req.body.location.longitude,
+      city: 'my-city',
+    };
+  }
+
+  if(!(req.body.loginCredentials.email || req.body.loginCredentials.password)) {
+    logger.error(`invalid login credentials data supplied, email: ${req.body.loginCredentials.email}, password: ${req.body.loginCredentials.password}`);
+    res.status(422).json({ 
+      message: `invalid login credentials data supplied, email: ${req.body.loginCredentials.email}, password: ${req.body.loginCredentials.password}`,
+      error: {}
+    });
+    return;
+  } else {
+    req.body.loginCredentials = {
+      email: req.body.email,
+      password: req.body.password,
+    };
+  }
+
+
   if(!req.body.name || !req.body.age) {
     logger.error(`invalid body data supplied, name: ${req.body.name}, age: ${req.body.age}`);
     res.status(422).json({ 
@@ -52,6 +82,9 @@ function validateUserBody(req, res, next) {
     });
     return;
   }
+
+  logger.info('--------')
+  logger.info(req.body)
   next();
 }
 

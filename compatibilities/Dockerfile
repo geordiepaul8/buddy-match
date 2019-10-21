@@ -12,11 +12,14 @@ ENV PORT=3000
 
 WORKDIR ${APP_FOLDER}
 
-COPY package.json package.json 
+COPY package.json package.json
+COPY package-lock.json package-lock.json 
 
-RUN npm install
+RUN npm ci --verbose
 
 COPY . . 
+
+VOLUME /data/db
 
 
 ENTRYPOINT ["npm", "start"]

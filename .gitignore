@@ -53,3 +53,8 @@
 /front-end/.coverage
 /front-end/node_modules/
 /front-end/static/
+
+
+/compatibilities/node_modules
+
+/docker-volumes/

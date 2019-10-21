@@ -1,46 +1,32 @@
-<form #userForm="ngForm">
-    <div class="form-group">
-      <label for="email">Email address</label>
-      <input type="email" 
-            class="form-control"
-            id="email"
-            name="email"
-            [(ngModel)]="email" 
-            aria-describedby="emailHelp" 
-            placeholder="Enter email">
-      <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
-    </div>
-    <div class="form-group">
-      <label for="password">Password</label>
-      <input type="password" 
-            class="form-control" 
-            id="password" 
-            name="password"
-            [(ngModel)]="password"
-            placeholder="Password">
-    </div>
-    <div class="form-group">
-        <label for="name">Name</label>
-        <input type="text" 
-                class="form-control" 
-                id="name" 
-                name="name"
-                [(ngModel)]="name"
-                placeholder="Your Full Name">
-    </div>
-    <div class="form-group">
-        <!-- This will be age group -->
-        <label for="age">Age</label>
-        <input type="number" 
-                class="form-control" 
-                id="age" 
-                name="age"
-                [(ngModel)]="age"
-                placeholder="YourAge">
-    </div>
-    
-    <button type="submit" 
-            class="btn btn-primary" 
-            (click)="registerNewUser()"
-    >Submit</button>
-  </form>
+<form #userForm="ngForm" (ngSubmit)="registerNewUser(userForm)">
+	<div class="form-group">
+		<label for="email">Email address</label>
+		<input type="email" class="form-control" id="email" name="email" ngModel aria-describedby="emailHelp"
+		 placeholder="Enter email">
+		<small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+	</div>
+	<div class="form-group">
+		<label for="password">Password</label>
+		<input type="password" class="form-control" id="password" name="password" ngModel placeholder="Password">
+	</div>
+	<div class="form-group">
+		<label for="name">Name</label>
+		<input type="text" class="form-control" id="name" name="name" [(ngModel)]="name" placeholder="Your Full Name">
+	</div>
+	<div class="form-group">
+		<!-- This will be age group -->
+		<label for="age">Age</label>
+		<input type="number" class="form-control" id="age" name="age" [(ngModel)]="age" placeholder="YourAge">
+	</div>
+
+	<br>
+	<div class="form-group">
+		<input type="text" id="latitude" name="latitude" [(ngModel)]="latitude" readonly="readonly" />
+	</div>
+	<div class="form-group">
+		<input type="text" id="longitude" name="longitude" [(ngModel)]="longitude" readonly="readonly" />
+	</div>
+
+
+	<button type="submit" class="btn btn-primary">Submit</button>
+</form>

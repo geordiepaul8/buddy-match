@@ -32,7 +32,7 @@ export class UserService {
 	getAllUsers(): Observable<any> {
 
 		return this.http.get<{message: string, users: Array<User>}>
-					('http://localhost:3000/v1/admin/user/getAllUsers');
+					('http://localhost:3000/v1/admin/user/getAllUsers/?matches=true&interests=true');
 	}
 
 	registerUser(user: User) {

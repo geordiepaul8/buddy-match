@@ -1,0 +1,184 @@
+<html>
+  <head>
+    {# <script src="https://kit.fontawesome.com/3c0c0bc887.js" crossorigin="anonymous"></script> #}
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+  </head>
+  <body>
+    <style>
+      .row {
+        border: 1px solid red;
+      }
+      small {
+        color: lightgrey;
+      }
+      h5: {
+        color: blue;
+        width: 100%;
+        display: block;
+      }
+      li > #loggedIn: {
+        color: green !important;
+        border: 1px solid green;
+      }
+
+    </style>
+
+    {% include './partials/navbar.njk' %}
+
+    <div class="container">
+      <div class="row">
+        <div class="col">
+          <h5>Add a new user</h5>
+          <form action="http://localhost:3000/v1/user/addUser" method="post">
+            <p>current-location:
+            <br>
+            <input type="text" id="latitude" name="latitude"  readonly="readonly" />
+            <input type="text" id="longitude" name="longitude" readonly="readonly" />
+            </p>
+            <br>
+            <input type="text" name="name"  placeholder="Enter your name"/>
+            <br>
+             <input type="number" name="age" placeholder="Enter your age"/>
+            <br>
+            <input type="email" name="email" autocomplete="my-email" placeholder="Enter your email"/>
+            <br>
+            <input type="password" name="password" autocomplete="current-password" placeholder="Enter your password"/>
+            <br>
+
+            <button type="submit">Add User</button>
+          </form>
+        </div>
+         <div class="col">
+          <h5>Select a User</h5>
+            <ul>
+              {% for user in pageData.users %}
+                {% if user.loginCredentials.isLoggedIn === false %}
+                <li>{{ user.name }} <a href='/login'>login</a></li>
+                {% endif %}
+              {% endfor %}
+            </ul>
+         </div>
+      </div>
+      <br>
+      <div class="row">
+        <div class="col">
+          <h5>List of Interests</h5>
+          <ul>
+            {% for interest in pageData.interests %}
+              <form action="http://localhost:3000/v1/user/addInterest/{{ userProfile._id }}/{{ interest._id }}" method="post">
+                <li>{{ interest.name }}
+                  -
+                  <button type="submit">Add interest</button>
+                </li>
+              </form>
+            {% endfor %}
+          </ul>
+        </div>
+        <div class="col">
+          <h1>{{ userProfile.name }}</h1>
+          <br>
+          <small>{{ userProfile._id }}</small>
+
+          <div class="row">
+            <div class="col">
+              <h5>user data:</h5>
+              <br>
+              <p>Location:
+                {{ userProfile.location.latitude }}
+                /
+                {{ userProfile.location.longitude }}
+                (
+                {{ userProfile.location.city }}
+                )</p>
+              <br>
+              <br>
+
+            </div>
+          </div>
+
+          <div class="row">
+            <h5>interests:
+              {{ userProfile.interests.length }}</h5>
+          </div>
+
+          <div class="row">
+            <h5>matches:
+              {{ userProfile.matches.length }}</h5>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    
+        {# window.onload = function () { #}
+                {# }; #}
+{# 
+                            document
+              .getElementById('startLat')
+              .innerHTML = startPos.coords.latitude;
+            document
+              .getElementById('startLon')
+              .innerHTML = startPos.coords.longitude; #}
+
+    <script>
+      $('document').ready(function () {
+        console.log('JQuery working');
+
+        // check for Geolocation support
+        if (navigator.geolocation) {
+          console.log('Geolocation is supported!');
+        } else {
+          console.log('Geolocation is not supported for this Browser/OS.');
+        }
+
+        
+          var startPos;
+          var geoSuccess = function (position) {
+            startPos = position;
+            console.log(position)
+
+
+
+             $('input[name=longitude]').val(startPos.coords.longitude);
+              $('input[name=latitude]').val(startPos.coords.latitude);
+          };
+          navigator
+            .geolocation
+            .getCurrentPosition(geoSuccess);
+
+
+        $('input[name=name]').val('my name');
+        $('input[name=age]').val(29);
+        $('input[name=email]').val('test@test.com');
+        $('input[name=password]').val('mypassword');
+
+        function distance(lon1, lat1, lon2, lat2) {
+          var R = 6371; // Radius of the earth in km
+          var dLat = (lat2 - lat1).toRad(); // Javascript functions in radians
+          var dLon = (lon2 - lon1).toRad();
+          var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(lat1.toRad()) * Math.cos(lat2.toRad()) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+          var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+          var d = R * c; // Distance in km
+          return d;
+        };
+
+        /** Converts numeric degrees to radians 
+        if (typeof(Number.prototype.toRad) === "undefined") {
+          Number.prototype.toRad = function () {
+            return this * Math.PI / 180;
+          }
+        };
+        */
+
+      });
+    </script>
+  </body>
+</html>

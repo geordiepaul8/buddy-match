@@ -20,6 +20,17 @@ const logger = require('./../utils/logger');
 
 
 
+router.get('/loginUser/:userId', (req, res) => {
+
+
+  // check the user exists in the db.
+
+
+
+});
+
+
+
 router.get('/getUser/:userId', jsonParser, validateUserId, (req, res) => {
 
   let interestsQuery = false;
@@ -32,7 +43,7 @@ router.get('/getUser/:userId', jsonParser, validateUserId, (req, res) => {
     req.query.matches != null ? matchesQuery = req.query.matches : matchesQuery = false;
     populateString = `${interestsQuery == 'true' ? 'interests' : ''} ${matchesQuery == 'true' ? 'matches' : ''}`;
   }
-
+  logger.warn(`populate string: ${populateString}`)
   // this will populate the details from the interests category 
   // into the category array by referening the _id
   userService.findOneUser(req.params.userId)
@@ -108,7 +119,8 @@ router.post('/addUser', jsonParser, validateUserBody, async (req, res) => {
     },
     loginCredentials: {
       email: req.body.loginCredentials.email,
-      password: req.body.loginCredentials.password
+      password: req.body.loginCredentials.password,
+      isLoggedIn: false,
     }
   },
   {
@@ -147,7 +159,7 @@ router.post('/addUser', jsonParser, validateUserBody, async (req, res) => {
     let pairsArray = compatibilitiesService.generateMatches([...usersArray]);
 
     logger.info(`******************************`)
-    logger.info(`users length: ${usersArray.length}`);
+    logger.info(`users length         : ${usersArray.length}`);
     logger.info(`pairsArray length    : ${pairsArray.length}`)
     logger.info(`******************************`)
 
@@ -236,7 +248,7 @@ router.post('/addUser', jsonParser, validateUserBody, async (req, res) => {
 });
 
 
-router.patch('/addInterest/:userId/:interestId', jsonParser, validateUserId, validateInterestId, (req, res) => {
+router.post('/addInterest/:userId/:interestId', jsonParser, validateUserId, validateInterestId, (req, res) => {
   userService.doesUserHaveInterest(req.params.userId, req.params.interestId)
   .then(result => {
     logger.info(`# of interests that match the new one to add: ${result.length}`);
