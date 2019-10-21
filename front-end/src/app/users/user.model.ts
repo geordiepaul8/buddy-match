@@ -7,12 +7,16 @@ export class User {
 	matches: any;
 	location: Location;
 	loginCredentials: LoginCredentials;
+	loginMetrics: LoginMetrics;
 }
 
 
 class LoginCredentials {
 	email: string;
 	password: string;
+}
+
+class LoginMetrics {
 	isLoggedIn: boolean;
 }
 

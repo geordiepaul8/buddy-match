@@ -41,7 +41,15 @@ export class UserService {
 
 	changeLogInUser(user: User) {
 		console.log(`logging in user: ${user.name}`);
+
+
+
 		// this.newUserLogin.emit(user);
 		this.changedUser.next(user);
+	}
+
+	changeLoginStatus(user: User) {
+		console.log(`changing login status of user: ${user.name}: from: ${user.loginMetrics.isLoggedIn}`)
+		return this.http.get<{message: string, loggedInStatus: boolean}>('http://localhost:3000/v1/user/setLogin/' + user._id + '/' + user.loginMetrics.isLoggedIn);
 	}
 }

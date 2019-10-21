@@ -27,9 +27,9 @@ module.exports = {
 *   Login a user
 */
 
-  loginUser: function loginUser(userId) {
+  loginUser: function loginUser(userId, loginStatus) {
     const query = {_id : userId};
-    const update = { $set: { 'logincredentials.isLoggedIn' : true } };
+    const update = { $set: { 'loginMetrics.isLoggedIn' : !loginStatus } };
     const options = {new: true, upsert: true};
     return User.findOneAndUpdate(query, update, options);
   },

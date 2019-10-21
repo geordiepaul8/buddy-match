@@ -43,7 +43,7 @@
             <br>
             <input type="text" name="name"  placeholder="Enter your name"/>
             <br>
-             <input type="number" name="age" placeholder="Enter your age"/>
+            <input type="number" name="age" placeholder="Enter your age"/>
             <br>
             <input type="email" name="email" autocomplete="my-email" placeholder="Enter your email"/>
             <br>
@@ -110,23 +110,11 @@
             <h5>matches:
               {{ userProfile.matches.length }}</h5>
           </div>
-
         </div>
-
       </div>
-
     </div>
 
     
-        {# window.onload = function () { #}
-                {# }; #}
-{# 
-                            document
-              .getElementById('startLat')
-              .innerHTML = startPos.coords.latitude;
-            document
-              .getElementById('startLon')
-              .innerHTML = startPos.coords.longitude; #}
 
     <script>
       $('document').ready(function () {
@@ -140,19 +128,16 @@
         }
 
         
-          var startPos;
-          var geoSuccess = function (position) {
-            startPos = position;
-            console.log(position)
-
-
-
-             $('input[name=longitude]').val(startPos.coords.longitude);
-              $('input[name=latitude]').val(startPos.coords.latitude);
-          };
-          navigator
-            .geolocation
-            .getCurrentPosition(geoSuccess);
+        var startPos;
+        var geoSuccess = function (position) {
+          startPos = position;
+          console.log(position)
+          $('input[name=longitude]').val(startPos.coords.longitude);
+          $('input[name=latitude]').val(startPos.coords.latitude);
+        };
+        navigator
+          .geolocation
+          .getCurrentPosition(geoSuccess);
 
 
         $('input[name=name]').val('my name');

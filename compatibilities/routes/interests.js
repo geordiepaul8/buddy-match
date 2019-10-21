@@ -14,7 +14,7 @@ const logger = require('./../utils/logger');
 
 
 
-router.post('/', jsonParser, validateInterestBody, (req, res) => {
+router.post('/addInterest', jsonParser, validateInterestBody, (req, res) => {
   logger.info(`adding an interest with name: ${req.body.name}`)
 
   let interest = new Interest({

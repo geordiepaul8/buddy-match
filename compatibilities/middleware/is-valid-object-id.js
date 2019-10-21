@@ -68,8 +68,8 @@ function validateUserBody(req, res, next) {
     return;
   } else {
     req.body.loginCredentials = {
-      email: req.body.email,
-      password: req.body.password,
+      email: req.body.loginCredentials.email,
+      password: req.body.loginCredentials.password,
     };
   }
 

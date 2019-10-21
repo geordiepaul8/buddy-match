@@ -20,10 +20,37 @@ const logger = require('./../utils/logger');
 
 
 
-router.get('/loginUser/:userId', (req, res) => {
+router.get('/setLogin/:userId/:loggedInStatus', (req, res) => {
 
 
-  // check the user exists in the db.
+  logger.info(`loggedInStatus: ${req.params.loggedInStatus}`)
+
+  // TODO: check the user exists in the db.
+
+  // set the isLoggedin to true or false
+
+  let logged = false;
+
+  if( req.params.loggedInStatus == 'true') {
+    logged = true;
+  }
+
+  userService.loginUser(req.params.userId, logged)
+  .then(result => {
+    logger.info(`logging in user: ${req.params.userId}`);
+    res.status(200).json({
+      message: 'ok',
+      loggedInStatus: !logged
+    })
+  })
+  .catch(err => {
+    logger.error(`error with login / logout function for user: ${req.params.userId}`)
+    res.status(404).json({
+      message: 'not ok',
+      loggedInStatus: logged
+    })
+  })
+
 
 
 
@@ -81,8 +108,8 @@ router.post('/addUser', jsonParser, validateUserBody, async (req, res) => {
 
   let interestsArray = [];
   let error = false;
-  logger.info(`adding a user with name: ${req.body.name}`)
 
+  logger.info(`adding a user with name: ${req.body.name}`)
 
   // Interest.find({})
   await interestService.findAllInterests()
@@ -120,7 +147,9 @@ router.post('/addUser', jsonParser, validateUserBody, async (req, res) => {
     loginCredentials: {
       email: req.body.loginCredentials.email,
       password: req.body.loginCredentials.password,
-      isLoggedIn: false,
+    },
+    loginMetrics: {
+      isLoggedIn: false
     }
   },
   {

@@ -83,16 +83,10 @@ let userProfile;
 userService.findAllUsers()
   .then((users) => {
     logger.info(`retrieving ${users.length} users`);
-    // res.status(200).json({
-    //   message: `retrieving ${users.length} users`,
-    //   users
-    // });
     usersArray = users;
-
   })
   .catch((err) => {
     logger.error(`error retrieving users: ${err}`);
-    // res.status(400).json({error: err});
   })
 
 logger.info(`length of users returned: ${usersArray.length}`)
@@ -101,49 +95,16 @@ logger.info(`length of users returned: ${usersArray.length}`)
 let populateString = 'interests matches';
 
 
-const loggedInUser = {};
+let loggedInUser = {};
 
 
-  userService.searchUsers({ 'loginCredentials.isLoggedIn': true })
+  userService.searchUsers({ 'loginMetrics.isLoggedIn': true })
   .then(async (users) => {
-    logger.info(`found ${users.length} logged in, piceking the first`)
-
-
-    if(users.length === 1) {
-      loggedInUser = users
-    }
-
+    logger.info(`found ${users.length} user logged in to the app`)
   })
   .catch(err => {
     logger.error(`error searching for logged in users: ${err}`)
   });
-
-
-  // userService.findOneUser(userId)
-  // .populate(populateString)
-  // .exec(async (err, userProfile) => {
-  //   if(err) {
-  //     logger.error(`there was an error with finding the user: ${userId}, please try again: ${err}`)
-  //     res.status(400).json({
-  //       message: `there was an error with finding the user: ${userId}, please try again`,
-  //       error: `${err}`
-  //     });
-  //   }
-  //   // if there is no profile for the userId, it will return <null>
-  //   // to handle the response, the API will send a 400 response
-  //   if(userProfile == null) {
-  //     logger.info(`there is no profile for user: ${userId}`)
-  //     // res.status(404).json({
-  //     //   message: `there is no profile for user: ${userId}`,
-  //     //   response: {}
-  //     // });
-  //     return;
-  //   }
-
-  //   return await userProfile;
-  // });
-
-
 
 
 

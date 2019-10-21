@@ -1,9 +1,18 @@
 <ul class="list-group list-group-flush">
-    <li class="list-group-item d-flex justify-content-between align-items-center" 
+    <li [ngClass]="user.loginMetrics.isLoggedIn ? 'loggedIn' : 'loggedOut'"
+        class="list-group-item d-flex justify-content-between align-items-center" 
         *ngFor="let user of userList">
-        {{ user.name }}
-        <span class="badge badge-primary badge-pill">{{user.interests.length}}</span>
-        <br>
-        <button class="btn btn-sm btn-primary" (click)="logInUser(user)">Log In</button>
+        <div>
+            
+            <span ><a href="" (click)="changeLoginStatus(user)">{{ user.name }}</a></span>
+            <br>
+            <small>{{ user._id }}</small>
+            <br>
+            <span style="float: left" class="badge badge-primary badge-pill">interests: {{user.interests.length}}</span>
+            <span style="float: left" class="badge badge-primary badge-pill">matches: {{user.matches.length}}</span>
+   
+            <!-- <button style="float: right" type="submit" class="btn btn-sm btn-primary" (click)="changeLoginStatus(user)">{{ user.loginMetrics.isLoggedIn }} Log In</button> -->
+   
+        </div>
     </li>
 </ul>

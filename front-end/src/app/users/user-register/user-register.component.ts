@@ -32,7 +32,9 @@ export class UserRegisterComponent implements OnInit {
 			age: userForm.value.age,
 			loginCredentials: {
 				email: userForm.value.email,
-				password: userForm.value.password,
+				password: userForm.value.password
+			},
+			loginMetrics: {
 				isLoggedIn: userForm.value.isLoggedIn
 			},
 			location: {
