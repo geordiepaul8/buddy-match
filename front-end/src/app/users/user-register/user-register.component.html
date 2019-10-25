@@ -1,32 +1,55 @@
-<form #userForm="ngForm" (ngSubmit)="registerNewUser(userForm)">
-	<div class="form-group">
+<form [formGroup]="userForm">
+<div class="form-group">
 		<label for="email">Email address</label>
-		<input type="email" class="form-control" id="email" name="email" ngModel aria-describedby="emailHelp"
-		 placeholder="Enter email">
-		<small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+		<input type="email" 
+					class="form-control" 
+					placeholder="Enter email"
+					formControlName="email">
 	</div>
-	<div class="form-group">
+<div class="form-group">
 		<label for="password">Password</label>
-		<input type="password" class="form-control" id="password" name="password" ngModel placeholder="Password">
+		<input type="password" 
+					class="form-control"
+					placeholder="Password"
+					formControlName="password">
 	</div>
 	<div class="form-group">
 		<label for="name">Name</label>
-		<input type="text" class="form-control" id="name" name="name" [(ngModel)]="name" placeholder="Your Full Name">
+		<input type="text" class="form-control" placeholder="Your Full Name"
+						formControlName="name">
 	</div>
 	<div class="form-group">
-		<!-- This will be age group -->
 		<label for="age">Age</label>
-		<input type="number" class="form-control" id="age" name="age" [(ngModel)]="age" placeholder="YourAge">
+		<input type="number" class="form-control" placeholder="YourAge"
+					formControlName="age">
 	</div>
 
 	<br>
 	<div class="form-group">
-		<input type="text" id="latitude" name="latitude" [(ngModel)]="latitude" readonly="readonly" />
+		<input type="text" formControlName="latitude" />
 	</div>
 	<div class="form-group">
-		<input type="text" id="longitude" name="longitude" [(ngModel)]="longitude" readonly="readonly" />
+		<input type="text" formControlName="longitude" />
+	</div>
+	<hr>
+	<h5>Add Interests</h5>
+	<br>
+	<div *ngFor="let interest of interestList; let i = index" class="row">
+		<div class="form-check">
+			<input class="form-check-input" type="checkbox" 
+						(change)="onChangeInterest(interest._id, $event.target.checked)">
+
+			<label class="form-check-label" for="defaultCheck1">
+				{{interest?.category}} : {{ interest?.name }}
+			</label>
+		</div>
+		<br>
 	</div>
 
+	<br>
+	<hr>
+	<br>
 
-	<button type="submit" class="btn btn-primary">Submit</button>
+
+	<button type="submit" class="btn btn-primary" (click)="addUser()">Submit</button>
 </form>

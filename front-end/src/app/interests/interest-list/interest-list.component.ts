@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
 import { InterestService } from '../interest-service';
+import { Interest } from '../interest.model';
 
 @Component({
   selector: 'app-interest-list',
@@ -8,6 +9,8 @@ import { InterestService } from '../interest-service';
   styleUrls: ['./interest-list.component.css']
 })
 export class InterestListComponent implements OnInit {
+
+  interestList: Array<Interest>
 
   constructor(private interestService: InterestService) { }
 
@@ -17,6 +20,7 @@ export class InterestListComponent implements OnInit {
     this.interestService.getAllInterests()
       .subscribe((allInterestsResponse) => {
         console.log(allInterestsResponse);
+        this.interestList = allInterestsResponse.interest;
       });
   }
 

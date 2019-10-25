@@ -1,18 +1,29 @@
 <ul class="list-group list-group-flush">
+    <!-- *ngIf="userList?.length < 1" -->
+    <div class="alert alert-primary">There are {{ userList?.length }} members stored</div>
     <li [ngClass]="user.loginMetrics.isLoggedIn ? 'loggedIn' : 'loggedOut'"
         class="list-group-item d-flex justify-content-between align-items-center" 
         *ngFor="let user of userList">
         <div>
+            <span style="float: left" class="badge badge-primary badge-pill">interests: {{user?.interests.length}}</span>
+            <span style="float: left" class="badge badge-primary badge-pill">matches: {{user?.matches.length}}</span>
+            <br>
+            <hr>
             
-            <span ><a href="" (click)="changeLoginStatus(user)">{{ user.name }}</a></span>
+            <span ><a routerLink="/user-list" (click)="changeLoginStatus(user)">{{ user?.name }}</a></span>
             <br>
-            <small>{{ user._id }}</small>
-            <br>
-            <span style="float: left" class="badge badge-primary badge-pill">interests: {{user.interests.length}}</span>
-            <span style="float: left" class="badge badge-primary badge-pill">matches: {{user.matches.length}}</span>
-   
+            <span>{{ user?._id }}</span>
+            <br>   
             <!-- <button style="float: right" type="submit" class="btn btn-sm btn-primary" (click)="changeLoginStatus(user)">{{ user.loginMetrics.isLoggedIn }} Log In</button> -->
-   
+            <br><br>
+            <button class="btn btn-sm btn-primary"
+                    routerLink="/user-profile/{{ user?._id }}">Show profile</button>
+            <button [ngClass]="user.loginMetrics.isLoggedIn ? 'btn-danger' : 'btn-success'"
+                    class="btn btn-sm"
+                    (click)="changeLoginStatus(user)"
+                    >Login/ Logout</button>
+            <button class="btn btn-danger btn-sm" btn-sm (click)="deleteUser(user)">Delete User</button>
         </div>
     </li>
 </ul>
+

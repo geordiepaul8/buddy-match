@@ -1,9 +1,8 @@
 import { Component, OnInit, Output,  EventEmitter } from '@angular/core';
 import { UserService } from './../users.service';
 
-
 import { User } from './../user.model';
-import { WebDriverLogger } from 'blocking-proxy/built/lib/webdriver_logger';
+
 
 @Component({
 	selector: 'app-user-list',
@@ -14,16 +13,12 @@ export class UserListComponent implements OnInit {
 
 	userList: Array<User>;
 	message: string;
-	// loggedInUser: string;
-
-
-
+	
 	@Output() newUserLogin = new EventEmitter<User>();
 
 	constructor(private userService: UserService) { }
 
 	ngOnInit() {
-		console.log('calling get users');
 		this.userService.getAllUsers()
 		.subscribe((allUsersResponse) => {
 			console.log(allUsersResponse);
@@ -39,10 +34,7 @@ export class UserListComponent implements OnInit {
 	
 		this.userService.changeLoginStatus(user)
 		.subscribe((response) => {
-			console.log(JSON.stringify(`response: ${response}`));
 			console.log(response)
-
-			
 		});
 		user.loginMetrics.isLoggedIn = !user.loginMetrics.isLoggedIn;
 	}
@@ -50,9 +42,29 @@ export class UserListComponent implements OnInit {
 	logInUser(user: User) {
 		console.log(`calling service: ${user.name}`);
 		this.userService.changeLogInUser(user)
-
 	}
 
+	
 
+	deleteUser(user: User) {
+		// remove the match id from the other users profile (front-end only)
+		this.userList.forEach(u => {
+			if (u._id !== user._id) {
+				user.matches.forEach(m => {
+					if(u.matches.includes(m)) {
+						console.log(`remove match [${m}] from user: ${u._id} : ${u.name}`)
+						let i = u.matches.indexOf(m);
+						u.matches.splice(i, 1);
+					}
+				});
+			}
+		})
 
+		console.log('calling delete user service')
+		this.userService.deleteUser(user)
+		.subscribe((response) => {
+			console.log(response)
+			this.userList.splice(this.userList.indexOf(user), 1);
+		});
+	}
 }

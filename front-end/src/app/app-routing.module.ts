@@ -7,18 +7,27 @@ import { UserRegisterComponent } from './users/user-register/user-register.compo
 
 import { InterestListComponent } from './interests/interest-list/interest-list.component';
 
+import { LoginComponent } from './auth/login/login.component';
+
 // each object represents a route
 // on calling home, will redirect to the user-profile page
 const routes: Routes = [
-	{ path: '', redirectTo: '/user-list', pathMatch: 'full' },
+	{ path: '', redirectTo: '/login', pathMatch: 'full' },
 	{ path: 'user-profile/:id', component: UserProfileComponent },
 	{ path: 'user-list', component: UserListComponent },
 	{ path: 'user-register', component: UserRegisterComponent },
-	{ path: 'all-interests', component: InterestListComponent }
+	{ path: 'all-interests', component: InterestListComponent },
+	{ path: 'login', component: LoginComponent },
+	{ path: '**', component: LoginComponent }
 ];
 
 @NgModule({
-	imports: [RouterModule.forRoot(routes)],
+	imports: [
+		RouterModule.forRoot(
+			routes,
+		//	{ enableTracing: true } // debugging purposes only
+			)
+	],
 	exports: [RouterModule]
 })
 export class AppRoutingModule { }

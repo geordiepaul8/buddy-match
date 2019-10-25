@@ -1,33 +1,48 @@
 <nav class="navbar navbar-expand-lg navbar-light" style="background-color: #e6fce7">
-    <a class="navbar-brand" href="#">Navbar</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
+    <a class="navbar-brand" href="#">Admin</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
     </button>
 
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
             <!-- if the user is loogged in then display their profile -->
-           <span  *ngIf="loggedInUser">
-                <li class="nav-item">
-                    <a class="nav-link" href="/">welcome: {{ loggedInUser.name }}</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" 
-                        href="/user-profile/{{loggedInUser._id}}">Your Profile <span class="sr-only">(current)</span></a>
-                </li>
-             </span>
             <li class="nav-item">
-                <a class="nav-link" href="/user-list">All Users</a>
+                <a class="nav-link" routerLink="/user-list">All Users</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="/user-register">Register New User</a>
+                <a class="nav-link" routerLink="/user-register">Register New User</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="/all-interests">See All interests</a>
+                <a class="nav-link" routerLink="/all-interests">See All interests</a>
             </li>
-           
+
 
         </ul>
-        
+
     </div>
 </nav>
+
+<nav class="navbar navbar-expand-lg navbar-light">
+    <a class="navbar-brand" routerLink="#">{{ loggedInUser?.name }}</a>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+                <a class="nav-link" routerLink="/user-profile/{{loggedInUser?._id}}">Your Profile <span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" routerLink="/user-profile/{{loggedInUser?._id}}">Add Interests <span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" routerLink="/user-profile/{{loggedInUser?._id}}">See Matches <span class="sr-only">(current)</span></a>
+            </li>
+        </ul>
+    </div>
+    <a [ngClass]="loggedInUser?.loginMetrics.isLoggedIn ? 'btn-outline-danger' : 'btn-outline-success'" 
+            class="btn my-2 my-sm-0" 
+            routerLink="/login"
+            >Login/Logout</a>
+</nav>
+
+            <!-- (click)="changeLoginStatus(loggedInUser)" -->

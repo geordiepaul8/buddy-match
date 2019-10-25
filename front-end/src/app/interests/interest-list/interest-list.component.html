@@ -1,1 +1,23 @@
-<p>interest-list works!</p>
+<div class="row">
+  <div class="col">
+    <div class="alert alert-info">There are {{ interestList?.length }} interests to choose from</div>
+    <br>
+    <ul class="list-group list-group-flush">
+        <li class="list-group-item d-flex justify-content-between align-items-center" 
+        *ngFor="let interest of interestList">
+          {{ interest.category }} : {{ interest.name }}
+          <br>
+          <br>
+          <!-- <button class="btn btn-sm btn-success">Add</button> -->
+          <button class="btn btn-danger btn-sm">Delete</button>
+        </li>
+    </ul>
+  </div>
+</div>
+
+
+<!-- [ngClass]="user.loginMetrics.isLoggedIn ? 'loggedIn' : 'loggedOut'" -->
+<br>
+<div class="row">
+<app-interest-add></app-interest-add>
+</div>

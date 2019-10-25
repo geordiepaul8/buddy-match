@@ -37,7 +37,12 @@ router.get('/setLogin/:userId/:loggedInStatus', (req, res) => {
 
   userService.loginUser(req.params.userId, logged)
   .then(result => {
-    logger.info(`logging in user: ${req.params.userId}`);
+    if (!logged) {
+      logger.info(`logging in user: ${req.params.userId}`);
+    } else {
+      logger.info(`logging out user: ${req.params.userId}`);
+    }
+    
     res.status(200).json({
       message: 'ok',
       loggedInStatus: !logged
@@ -70,7 +75,7 @@ router.get('/getUser/:userId', jsonParser, validateUserId, (req, res) => {
     req.query.matches != null ? matchesQuery = req.query.matches : matchesQuery = false;
     populateString = `${interestsQuery == 'true' ? 'interests' : ''} ${matchesQuery == 'true' ? 'matches' : ''}`;
   }
-  logger.warn(`populate string: ${populateString}`)
+  // logger.warn(`populate string: ${populateString}`)
   // this will populate the details from the interests category 
   // into the category array by referening the _id
   userService.findOneUser(req.params.userId)
@@ -111,7 +116,6 @@ router.post('/addUser', jsonParser, validateUserBody, async (req, res) => {
 
   logger.info(`adding a user with name: ${req.body.name}`)
 
-  // Interest.find({})
   await interestService.findAllInterests()
     .then(async (interests) => {
       logger.info(`retrieving ${interests.length} interests`)
@@ -137,7 +141,7 @@ router.post('/addUser', jsonParser, validateUserBody, async (req, res) => {
   let newUser = new User({
     name: req.body.name,
     age: req.body.age,
-    interests: [], //only adding this for debugging
+    interests: req.body.interests,
     matches: [],
     location: {
       latitude: req.body.location.latitude,

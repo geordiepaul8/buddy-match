@@ -4,7 +4,7 @@ import { HttpClientModule } from '@angular/common/http';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 
 
@@ -19,6 +19,8 @@ import { UserRegisterComponent } from './users/user-register/user-register.compo
 import { UserListComponent } from './users/user-list/user-list.component';
 
 import { InterestListComponent } from './interests/interest-list/interest-list.component';
+import { LoginComponent } from './auth/login/login.component';
+import { InterestAddComponent } from './interests/interest-add/interest-add.component';
 
 @NgModule({
 	declarations: [
@@ -28,13 +30,16 @@ import { InterestListComponent } from './interests/interest-list/interest-list.c
 		UserProfileComponent,
 		UserProfileMatchesComponent,
 		UserRegisterComponent,
-		InterestListComponent
+		InterestListComponent,
+		LoginComponent,
+		InterestAddComponent
 	],
 	imports: [
 		BrowserModule,
 		AppRoutingModule,
 		HttpClientModule,
-		FormsModule
+		FormsModule,
+		ReactiveFormsModule
 	],
 	providers: [UserService, InterestService],
 	bootstrap: [AppComponent]

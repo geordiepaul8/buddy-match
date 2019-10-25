@@ -27,6 +27,22 @@ router.get('/interests/getAllInterests', (req, res) => {
   })
 });
 
+// get all matches
+router.get('/user/getAllMatches', jsonParser, (req, res) => {
+  compatibilitiesService.db_getAllMatches()
+  .then((matches) => {
+    logger.info(`retrieving ${matches.length} matches`);
+    res.status(200).json({
+      message: `retrieving ${matches.length} matches`,
+      matches
+    });
+  })
+  .catch((err) => {
+    logger.error(`error retrieving matches: ${err}`);
+    res.status(400).json({error: err});
+  })
+})
+
 
 // get all users
 router.get('/user/getAllUsers', jsonParser, (req, res) => {
@@ -66,13 +82,51 @@ router.delete('/:interest_id', jsonParser, (req, res) => {
   });
 })
 
-router.delete('/deleteUser/:user_id', jsonParser, (req, res) => {
+router.delete('/user/deleteUser/:user_id', jsonParser, (req, res) => {
 
   logger.info(`deleting user ${req.params.user_id}`);
   // loop through all user records and set a remove marker?
   // for now it will just delete the record
 
   var query = {_id : req.params.user_id};
+
+  let tempMatches;
+  //remove all matches
+
+  compatibilitiesService.db_getAllMatchesForSingleUser(req.params.user_id)
+  .then((response) => {
+    tempMatches = response;
+    logger.info(`# of matches: ${tempMatches.length}`)
+
+    // before deleting that match for the selected user, ensure the match for the other user has been deleted
+    // let { users } = tempMatches.
+
+
+
+    tempMatches.forEach(match => {
+
+      let users = match.users.filter(x => x != req.params.user_id);
+
+
+      userService.removeMatchesFromUser(users[0], match._id)
+      .then(response => [
+        logger.warn(`user: [${users[0]}] has had match [${match._id}] removed from their profile`)
+      ])
+
+
+
+      logger.warn(users)
+
+      compatibilitiesService.deleteMatch(match._id)
+      .then((response) => {
+        logger.warn(`removed ${response._id} from match array`);
+      })
+    })
+
+  });
+
+
+
 
   // User.findOneAndRemove(query)
   userService.deleteUser(req.params.user_id)

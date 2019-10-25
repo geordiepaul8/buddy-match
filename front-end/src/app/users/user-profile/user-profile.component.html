@@ -1,36 +1,91 @@
 <div class="container-fluid">
-    <h1>{{ loggedInUser?.name}} Aged: {{ loggedInUser?.age }}</h1>
+  <div class="row">
+    <div class="col">
+      <h5>Profile</h5>
+      <div class="card">
+        <div class="card-header">
+          <h5 class="card-title">{{ loggedInUser?.name}}</h5>
+          <h6 class="card-subtitle mb-2 text-muted">{{ loggedInUser?._id }}</h6>
+          <h6 class="card-subtitle mb-2 text-muted">{{loggedInUser?.loginCredentials?.email}}</h6>
+        </div>
+        <div class="card-body">
+          <p class="card-text">Age: {{ loggedInUser?.age }}</p>
+          <h5 class="card-title">Location Details</h5>
+          <ul class="card-text">
+            <li>Position: {{loggedInUser?.location?.latitude }} / {{loggedInUser?.location?.longitude }}</li>
+            <li>City: {{loggedInUser?.location?.city }}</li>
+          </ul>
+          <h5 class="card-title">Interests</h5>
+          <ul class="card-text">
+            <li *ngFor="let interest of loggedInUser?.interests">{{ interest.name }}</li>
+          </ul>
+          <br>
+          <hr>
+          <a href="#" class="card-link">Change password</a>
+          <a href="#" class="card-link">Interests</a>
+          <a href="#" class="card-link">Settings</a>
+        </div>
+        <div class="card-footer text-muted">
+          Last Updated: {{ loggedInUser?.updatedAt }}
+          <hr>
+          <h5>Your settings</h5>
+          <ul>
+            <li>Want to be searched? Y/N</li>
+            <li>Distance for match: Default is 50nm (same country only)</li>
+            <li>Distance that searchees can look for you</li>
+            <li>notifications on events that match you in your location?</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="col">
+      <h5>Matches</h5>
+      <ul>
+        <!-- | orderBy: '-match.compatibilityScore' -->
+        <li *ngFor="let match of loggedInUser?.matches">
+          <div [ngClass]="match?.compatibilityScore !== 0 ? 'alert-info' : 'alert-danger'" 
+              class="alert">
+            <!-- <p>{{ match?._id }}</p> -->
+            <span *ngFor="let u of userMatchesList">
+              <strong>
+                <h5 *ngIf="match?.users.indexOf(u?._id) > -1">{{ u?.name }} : [{{ match?.compatibilityScore }}]</h5>
+              </strong>
+            </span>
+            <p></p>
+            <p>breakdown:</p>
+            <div class="row">
+              <div class="col"></div>
+              <div class="col">Scores</div>
+              <div class="col">Count</div>
 
-    <h5>Login Details</h5>
-    <ul>
-        <li>email: {{loggedInUser?.loginCredentials?.email}}</li>
-        <li>password: {{loggedInUser?.loginCredentials?.password}}</li>
-    </ul>
+            </div>
+            <div class="row">
 
-    <h5>Location Details</h5>
-    <ul>
-        <li>Position: {{loggedInUser?.location?.latitude }} / {{loggedInUser?.location?.longitude }}</li>
-        <li>City: {{loggedInUser?.location?.city }}</li>
-    </ul>
+              <div class="col">
+                <p>age</p>
+                <p>interests</p>
+                <p>categories</p>
+                <p>Location</p>
+              </div>
+              <div class="col">
+                <!-- scores -->
+                <p>{{ match?.compatibilityResultsObject[0].age.ageMatchScore }}</p>
+                <p>{{ match?.compatibilityResultsObject[0].interest.interestMatchScore }} </p>
+                <p>{{ match?.compatibilityResultsObject[0].interestCategory.interestCategoryMatchScore }} </p>
+              </div>
+              <div class="col">
+                <!-- counts -->
+                <p>-</p>
+                <p>{{ match?.compatibilityResultsObject[0].interest.countOfInterestMatches }} </p>
+                <p>{{ match?.compatibilityResultsObject[0].interestCategory.countOfInterestCategoryMatches }} </p>
+              </div>
+            </div>
 
-    <h5>Interests</h5>
-    <ul>
-        <li *ngFor="let interest of  loggedInUser?.interests">{{ interest.name }}</li>
-    </ul>
 
-    <h5>matches</h5>
-    <ul>
-        <li *ngFor="let match of  loggedInUser?.matches">{{match?.users[1]}} - [{{match?.compatibilityScore}}]</li>
-    </ul>
-
-
-    <h5>Your Settings:</h5>
-
-    <ul>
-        <li>Want to be searched? Y/N</li>
-        <li>Distance for companion match: Default is 50nm (same country only)</li>
-        <li>Distance that searchees can look for you</li>
-        <li>notifications on events that match you in your location?</li>
-    </ul>
-
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <br>
 </div>
