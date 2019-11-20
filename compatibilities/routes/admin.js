@@ -1,64 +1,61 @@
 const router = require('express').Router();
 const bodyParser = require('body-parser')
 const jsonParser = bodyParser.json()
-
 // services
 const compatibilitiesService = require('./../service/compatibilities');
 const interestService = require('./../service/interests');
 const userService = require('./../service/users');
-
 // logger
 const logger = require('./../utils/logger');
-
-
-// get all interests
-router.get('/interests/getAllInterests', (req, res) => {
-  interestService.findAllInterests()
-  .then((interest) => {
-    logger.info(`retrieving ${interest.length} interests.`)
-    res.status(200).json({
-      message: `retrieving ${interest.length} interests.`,
-      interest
-    });
-  })
-  .catch((err) => {
-    logger.error(`error retrieving interests: ${err}`)
-    res.status(400).json({error: err});
-  })
-});
-
-// get all matches
-router.get('/user/getAllMatches', jsonParser, (req, res) => {
-  compatibilitiesService.db_getAllMatches()
-  .then((matches) => {
-    logger.info(`retrieving ${matches.length} matches`);
-    res.status(200).json({
-      message: `retrieving ${matches.length} matches`,
-      matches
-    });
-  })
-  .catch((err) => {
-    logger.error(`error retrieving matches: ${err}`);
-    res.status(400).json({error: err});
-  })
-})
+// middleware
+const checkUserToken = require('./../middleware/check-user-token');
+const { validateInterestId } = require('./../middleware/is-valid-object-id');
 
 
 // get all users
-router.get('/user/getAllUsers', jsonParser, (req, res) => {
-  userService.findAllUsers()
-  .then((users) => {
-    logger.info(`retrieving ${users.length} users`);
-    res.status(200).json({
-      message: `retrieving ${users.length} users`,
-      users
+
+// checkUserToken, 
+router.get('/user/getAllUsers', jsonParser, async (req, res) => {
+  const allUsers = await userService.findAllUsers()
+    .cache()
+    .then((users) => {
+      logger.info(`retrieving ${users.length} users`);
+      res.status(200).json({
+        message: `retrieving ${users.length} users`,
+        users
+      });
+    })
+    .catch((err) => {
+      logger.error(`error retrieving users: ${err}`);
+      res.status(400).json({error: err});
+    });
+});
+
+
+// validateInterestId, 
+router.delete('/interests/deleteInterest/:id',jsonParser, (req, res) => {
+  const client = require('./../service-config/redis');
+
+  logger.info(`deleting an interest with name: ${req.body.name}`)
+
+  let i = interestService.deleteInterest(req.params.id)
+  .then( result => {
+    logger.info(`interest: [${req.params.id}] deleted`);
+
+    //remove the key from the cache so on the next 'getAll' the cache will be updated with the lates
+    client.del("{\"collection\":\"interests\"}")
+
+    res.status(201).json({
+      message: `interest: [${req.params.id}] deleted`,
     });
   })
-  .catch((err) => {
-    logger.error(`error retrieving users: ${err}`);
-    res.status(400).json({error: err});
-  })
-})
+  .catch( err => {
+    logger.error(`error deleting interest: ${err}`);
+    res.status(400).json({ 
+      message: `error deleting interest: ${err}`,
+    });
+  });
+});
 
 
 
@@ -80,7 +77,103 @@ router.delete('/:interest_id', jsonParser, (req, res) => {
         message: err
       });
   });
-})
+});
+
+
+/*
+*   @param {id} the ObjectId of the user that has been deleted
+*/
+async function purgeMatchesListFromDeleteUser(id) {
+
+  const client = require('./../service-config/redis');
+  client.del("{\"collection\":\"matches\"}")
+
+  logger.warn(`*******  PRUNING MATCHES FOR: ${id} ********`)
+
+  let users;
+  const u = await userService.findAllUsers()
+    .cache()
+    .then(results => {
+      users = results;
+    })
+    .catch(err => {
+      logger.error(`Error finding all users: ${err}`);
+    })
+  
+  logger.info(`users length:   ${users.length}`);
+
+  // 1. filter all matches for that user id
+
+  let matches;
+  let m = await compatibilitiesService.db_getAllMatchesForSingleUser(id)
+    .then(results => {
+      matches = results.filter(m => m.users.includes(id));
+    })
+    .catch(e => {
+      logger.error(`error: ${e}`);
+    });
+
+  logger.info(`matches length: ${matches.length}`);
+
+    // send the matches to the delete Q to be processed by another server
+
+    /*
+    *   push the data to the delete match Q
+    */
+
+    const RABBIT_USER = process.env.RABBIT_USER || 'user';
+    const RABBIT_PASS = process.env.RABBIT_PASS || 'user';
+    const RABBIT_HOST = process.env.RABBIT_HOST || 'localhost';
+    const RABBIT_VHOST = process.env.RABBIT_VHOST || 'vhost';
+    const RABBIT_PORT = process.env.RABBIT_PORT || 5672;
+    const RABBIT_DELETE_X = process.env.RABBIT_DELETE_X || 'DeleteExchange';
+
+    const amqp = require('amqplib')
+
+    amqp.connect(`amqp://${RABBIT_USER}:${RABBIT_PASS}@${RABBIT_HOST}:${RABBIT_PORT}/${RABBIT_VHOST}`)
+      .then(async conn => {
+        logger.info(`RabbitMQ connection established on port: ${RABBIT_PORT}`);
+
+        await conn.createChannel()
+          .then(async channel => {
+            // Buffer.from(JSON.stringify(matches)
+            await channel.publish(RABBIT_DELETE_X, 'deleteMatch', Buffer.from(id))
+            logger.info(`sent to ${RABBIT_DELETE_X}`)
+            // client.del("{\"collection\":\"matches\"}")
+          })
+          .catch(err => {
+            logger.error(`error creating channel: ${err}`)
+          });
+      })
+      .catch(err => {
+        logger.error(`Error with RabbitMQ connection: ${err}`)
+      });
+    
+      // matches.forEach( m => {
+      //   // logger.info(`m: ${m._id}`)
+
+      //   // 2. delete interest from other users account
+      //   let otherUserId = m.users.filter(u => u != id);
+        
+      //   logger.info(`other user id: ${otherUserId}`)
+      //   let um = userService.removeMatchesFromUser(otherUserId, m._id)
+      //     .then(r => {
+      //       // logger.warn(`removed match id: [${m._id}] from user id: [${otherUserId}]`)
+      //     })
+
+      //   // 3. delete the match from the list
+      //   let dm = compatibilitiesService.deleteMatch(m._id)
+      //     .then((response) => {
+      //       // logger.warn(`removed ${response._id} from match array`);
+      //     })
+      //     .catch(e => {
+      //       logger.error(`error: ${e}`);
+      //     });
+      // });
+
+      logger.warn('********************************************')
+}
+
 
 router.delete('/user/deleteUser/:user_id', jsonParser, (req, res) => {
 
@@ -88,50 +181,18 @@ router.delete('/user/deleteUser/:user_id', jsonParser, (req, res) => {
   // loop through all user records and set a remove marker?
   // for now it will just delete the record
 
-  var query = {_id : req.params.user_id};
-
-  let tempMatches;
-  //remove all matches
-
-  compatibilitiesService.db_getAllMatchesForSingleUser(req.params.user_id)
-  .then((response) => {
-    tempMatches = response;
-    logger.info(`# of matches: ${tempMatches.length}`)
-
-    // before deleting that match for the selected user, ensure the match for the other user has been deleted
-    // let { users } = tempMatches.
+  const p = purgeMatchesListFromDeleteUser(req.params.user_id);
 
 
-
-    tempMatches.forEach(match => {
-
-      let users = match.users.filter(x => x != req.params.user_id);
-
-
-      userService.removeMatchesFromUser(users[0], match._id)
-      .then(response => [
-        logger.warn(`user: [${users[0]}] has had match [${match._id}] removed from their profile`)
-      ])
-
-
-
-      logger.warn(users)
-
-      compatibilitiesService.deleteMatch(match._id)
-      .then((response) => {
-        logger.warn(`removed ${response._id} from match array`);
-      })
-    })
-
-  });
-
-
-
-
+  // var query = {_id : req.params.user_id};
   // User.findOneAndRemove(query)
-  userService.deleteUser(req.params.user_id)
+  let u = userService.deleteUser(req.params.user_id)
     .then(r => {
-    logger.info(`user [${req.params.user_id}] has been successfully deleted`)
+      logger.info(`user [${req.params.user_id}] has been successfully deleted`)
+
+      const client = require('./../service-config/redis');
+      //remove the key from the cache so on the next 'getAll' the cache will be updated with the lates
+      client.del("{\"collection\":\"users\"}")
 
       res.status(204).json();
     })
@@ -140,8 +201,7 @@ router.delete('/user/deleteUser/:user_id', jsonParser, (req, res) => {
         message: err
       });
   });
-
-})
+});
 
 
 

@@ -9,7 +9,7 @@ const logger = require('./logger');
 
 module.exports = (pairsArray) => {
 
-    logger.info('in matches: ' + pairsArray)
+    // logger.info('in matches: ' + pairsArray)
     //logger.info(`users in matches: ${pairsUsers}`);
 
     let matchArray = [];

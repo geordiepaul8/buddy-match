@@ -8,6 +8,7 @@ export class User {
 	location: Location;
 	loginCredentials: LoginCredentials;
 	loginMetrics: LoginMetrics;
+	settings: Settings
 }
 
 
@@ -24,4 +25,15 @@ class Location {
 	latitude: number;
 	longitude: number;
 	city: string;
+}
+
+class Settings {
+	ageFilter: AgeFilter;
+	searchDistance: number;
+}
+
+class AgeFilter {
+	isSet: boolean;
+	min: number;
+	max: number;
 }

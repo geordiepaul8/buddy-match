@@ -15,8 +15,10 @@ const { validateUserId } = require('./../middleware/is-valid-object-id');
 // logger
 const logger = require('./../utils/logger');
 
+const checkUserToken = require('./../middleware/check-user-token');
 
-router.get('/matchesForOneUser/:userId', jsonParser, validateUserId, (req, res) => {
+
+router.get('/matchesForOneUser/:userId', checkUserToken, jsonParser, validateUserId, (req, res) => {
   compatibilitiesService.db_getAllMatchesForSingleUser(req.params.userId)
     .then(results => {
       logger.info(`${results.length} matches successfully returned for ${req.params.userId}.`);
@@ -34,13 +36,14 @@ router.get('/matchesForOneUser/:userId', jsonParser, validateUserId, (req, res) 
 
 })
 
-router.get('/allMatches', jsonParser, (req, res) => {
-  compatibilitiesService.db_getAllMatches()
-    .then(results => {
-      logger.info(`${results.length} matches successfully returned from all users`);
+router.get('/allMatches', jsonParser, async (req, res) => {
+  let am = await compatibilitiesService.db_getAllMatches()
+    .cache()
+    .then(matches => {
+      logger.info(`${matches.length} matches`);
       res.status(200).json({
-        message: `${results.length} matches successfully returned from all users.`,
-        matches: results
+        message: `${matches.length} matches`,
+        matches
       });
     })
     .catch(err => {
@@ -58,7 +61,7 @@ router.get('/matchAllUsers', jsonParser, async (req, res) => {
 
   // console.log('matching all users and generating the db ');
 
-  logger.info(`get /matchAllUsers....`);
+  //logger.info(`get /matchAllUsers....`);
 
   let newUsers;
 

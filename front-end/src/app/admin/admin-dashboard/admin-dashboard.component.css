@@ -1,0 +1,110 @@
+.fa-map-marker {
+  color: #f0ad4e;
+}
+
+.fa-cube, .fa-cubes {
+  color: #d9534f;
+}
+
+.fa-user {
+  color: #5cb85c;
+}
+
+
+.user-card {
+  height: 100%;
+  width: 100%;
+  display: inline-block;
+}
+
+.name {
+  float: left;
+}
+
+.user-card-metrics {
+  text-align: left;
+  float: left;
+}
+
+.button.user-card-button{
+  text-align: right;
+  float: right;
+}
+
+.button.interest-card-button{
+  text-align: right;
+  float: right;
+}
+
+.user-card .fa-user {
+  color: #5cb85c
+}
+
+
+
+.user-card-metrics .fa-map-marker {
+  color: #f0ad4e;
+}
+
+.user-card-metrics .fa-cubes,
+.user-card-name .fa-cube {
+  color: #d9534f;
+  margin-right: 10px;
+}
+
+.user-card-metrics .fa-arrows-h {
+  color: #5bc0de;
+  margin-right: 10px;
+}
+
+.button{
+  float: left;
+}
+
+.card-match {
+  float: left
+}
+
+.user-card-match {
+  /* border: 1px solid red; */
+  /* width: 70%; */
+  float: left
+}
+
+.user-card-score {
+  /* border: 1px solid red; */
+  /* text-align: right; */
+}
+
+/* .user-card-score > p.total-score {
+  color: #5bc0de;
+  font-size: 30px;
+} */
+
+.user-card-footer .sub-scores {
+  float: right;
+
+
+}
+
+.sub-scores>p {
+  padding: 3px 8px 0px 8px;
+  border-left: 1px solid grey
+}
+
+.sub-scores>p>i.fa-user {
+  color: #5cb85c
+}
+
+.sub-scores>p>i.fa-cube,
+.sub-scores>p>i.fa-cubes {
+  color: #d9534f;
+}
+
+.sub-scores.sub-scores-map {
+  min-width: 20px;
+}
+
+.user-card-name-clickable {
+  cursor: pointer;
+}

@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
 const Match = require('./../models/all-models').matchesModel;
 
+// const nMatch = require('./../models/all-models').n_matchesModel;
+
 
 const generateUserIdArray = require('./../utils/generate-user-id-array');
 const generatePairsUserIdArray = require('./../utils/generate-pairs-user-id-array');
@@ -38,8 +40,9 @@ module.exports = {
   /*
   **  get all matches
   */
-  db_getAllMatches: async function db_getAllMatches() {
-    return await Match.find({});
+  db_getAllMatches: function db_getAllMatches() {
+    // return Match.find({});
+    return Match.find({});
   },
 
   /*
@@ -58,15 +61,14 @@ module.exports = {
     return await match.save();
   },
 
-  deleteMatch: async function deleteMatch(matchId) {
-    return await Match.findOneAndRemove({ _id: matchId });
+  deleteMatch: function deleteMatch(matchId) {
+    return Match.findOneAndRemove({ _id: matchId });
   },
 
 /*
 **  usersArray  = the full db user profiles
 */
   generateMatches: function generateMatches(usersArray) {
-
     let userId1     = [];
     let userId2     = [];
     let pairsArray  = [];
@@ -79,59 +81,19 @@ module.exports = {
     return pairsArray;
   },
 
-  generateCompatibilityResultsObject: function generateCompatibilityResultsObject(user1, user2, interests) {
-    let ageMatchScore = 0;
-    let ageDifference = 0;
-    let interestMatchScore = 0;
-    let countOfInterestMatches = 0;
-    let interestCategoryMatchScore = 0;
-    let countOfInterestCategoryMatches = 0;
-    let totalCompatibilityScore = 0;
 
-    // caluclate age diff & score
-    ageDifference = Math.abs(user1.age - user2.age);
-
-    // loop through current user interests and match category with temp user
-    ageMatchScore = returnAgeScore(ageDifference);
-
-    // get the interest id from the current user and loop through each one
-    if(user1.interests.length > 0 && user2.interests.length > 0) {
-      // if they match on category, but not becessartily interest, they will still have a compatibility score
-      // increased
-      countOfInterestMatches = getCountOfInterestMatches(user1.interests, user2.interests);          
-      interestMatchScore = 10 * countOfInterestMatches; 
-
-      // now check that their interests match as it will futher enhance their compatibility score
-      countOfInterestCategoryMatches = getCountOfInterestCategoryMatches(user1.interests, user2.interests);
-      interestCategoryMatchScore = 10 * countOfInterestCategoryMatches;
-    } 
-
-    totalCompatibilityScore = interestCategoryMatchScore + interestMatchScore + ageMatchScore;
-
-    let compatibilityResultsObject = {
-      totalCompatibilityScore,
-      age: {
-          ageMatchScore,
-          ageDifference
-      },
-      interestCategory: {
-          interestCategoryMatchScore,
-          countOfInterestCategoryMatches
-      },
-      interest: {
-          interestMatchScore,
-          countOfInterestMatches
-      }
-    }
-
-    return compatibilityResultsObject;
-
-  },
 
   /*
   **  takes ${pairsArray} and returns a Match model
   **  will send to the db in <compatibilities> collection
+  **
+  **  New rules associated with the generation of the match model
+  **  1.  The totalCompatibilityScore will be zero'd if:
+  **      a) the distance is outside of 50nm (this will change to user settings)
+  **      b) only the age makes up the score - need interests to help the age bias the score
   */
+
+  // TODO: only zero on user settings distance - let them decide who they wat to pair up with
   generateMatchModel: function generateMatchModel(user1, user2, interests) {
 
     let ageMatchScore = 0;
@@ -140,103 +102,153 @@ module.exports = {
     let countOfInterestMatches = 0;
     let interestCategoryMatchScore = 0;
     let countOfInterestCategoryMatches = 0;
-    let totalCompatibilityScore = 0;
+    let totalCompatibilityScore = -1;
+    let matchLocationDistance = 0;
+    let matchLocationScore = 0;
+
+    let u1Compat;
+    let u2Compat;
 
     logger.info(`/generateMatchModel`);
-    // logger.info(`user 1 interests: ${user1.interests.length}`);
-    // logger.info(`user 2 interests: ${user2.interests.length}`);
-    
+    logger.info(`user 1 ${user1.name} interests: ${user1.interests.length}`);
+    logger.info(`user 2 ${user2.name} interests: ${user2.interests.length}`);
+
     // caluclate age diff & score
     ageDifference = Math.abs(user1.age - user2.age);
-
-    // loop through current user interests and match category with temp user
     ageMatchScore = returnAgeScore(ageDifference);
 
-    // get the interest id from the current user and loop through each one
+
+    // build the location object
+    const getDistance = require('./../utils/get-distance-between-locations');
+    const getDistanceScore = require('./../utils/get-distance-score');
+
+    matchLocationDistance = getDistance(user1.location, user2.location);
+    matchLocationScore = getDistanceScore(matchLocationDistance);
+
     if(user1.interests.length > 0 && user2.interests.length > 0) {
-      // if they match on category, but not becessartily interest, they will still have a compatibility score
+      // if they match on category, but not necessartily interest, they will still have a compatibility score
       // increased
       countOfInterestMatches = getCountOfInterestMatches(user1.interests, user2.interests);          
-      interestMatchScore = 10 * countOfInterestMatches; 
+      interestMatchScore = 10 * countOfInterestMatches;
+      let interestMatched = ((countOfInterestMatches / user1.interests.length) * 100).toFixed(2);;
 
       // now check that their interests match as it will futher enhance their compatibility score
       countOfInterestCategoryMatches = getCountOfInterestCategoryMatches(user1.interests, user2.interests, interests);
       interestCategoryMatchScore = 10 * countOfInterestCategoryMatches;
-    } 
 
-    totalCompatibilityScore = interestCategoryMatchScore + interestMatchScore + ageMatchScore;
+    // if the user only wants to see 50nm searchees, then zero the compat score if the 
+    // distance is greater
+    if (matchLocationDistance > user1.settings.searchDistance) {
+      logger.info(`total = 0 as the distance is greater than the users search distance`)
+      totalCompatibilityScore = 0;
+    } else {
 
-    let match = new Match({
-      users: [],
-      compatibilityScore: totalCompatibilityScore,
-      compatibilityResultsObject: [],
-    });
+      totalCompatibilityScore = parseInt(interestCategoryMatchScore + interestMatchScore + ageMatchScore) + parseInt(interestMatched);
+    }
 
-    let compatibilityResultsObject = {
-      totalCompatibilityScore,
-      age: {
+
+    
+    //check the age vs compat
+    if(ageMatchScore === totalCompatibilityScore) {
+      logger.info(`resetting toital as ageMatchscore score is totalCompat`)
+      totalCompatibilityScore = 0;
+    }
+    
+
+    logger.info(`user1 [${user1.name}] -> user2 [${user2.name}] : ${countOfInterestMatches}: [${interestCategoryMatchScore}] {${interestMatched}%} total = ${totalCompatibilityScore}`);
+
+    // TODO: move outside of whether interests > 0
+      u1Compat = {
+        _id: user1._id,
+        name: user1.name,
+        target_id: user2._id,
+        target_name: user2.name,
+        totalCompatibilityScore,
+        age: {
           ageMatchScore,
           ageDifference
-      },
-      interestCategory: {
+        },
+        interestCategory: {
           interestCategoryMatchScore,
           countOfInterestCategoryMatches
-      },
-      interest: {
+        },
+        interest: {
           interestMatchScore,
-          countOfInterestMatches
+          countOfInterestMatches,
+          interestMatched
+        },
+        locationResultsObject: {
+          distance: matchLocationDistance,
+          score: matchLocationScore
+        }
+      }
+
+
+      countOfInterestMatches = getCountOfInterestMatches(user2.interests, user1.interests);          
+      interestMatchScore = 10 * countOfInterestMatches; 
+      interestMatched = ((countOfInterestMatches / user2.interests.length) * 100).toFixed(2);
+
+      // now check that their interests match as it will futher enhance their compatibility score
+      countOfInterestCategoryMatches = getCountOfInterestCategoryMatches(user2.interests, user1.interests, interests);
+      interestCategoryMatchScore = 10 * countOfInterestCategoryMatches;
+
+    // TODO: if the user setting has changed from default, check it or zero it
+    if (matchLocationDistance > user2.settings.searchDistance) {
+      logger.info(`total = 0 as the distance is greater than the users search distance`)
+      totalCompatibilityScore = 0;
+    } else {
+      totalCompatibilityScore = parseInt(interestCategoryMatchScore + interestMatchScore + ageMatchScore) + parseInt(interestMatched);
+    }
+
+    
+
+
+    
+    //check the age vs compat
+    if(ageMatchScore === totalCompatibilityScore) {
+      logger.info(`reseting total as ageMatchscore score is totalCompat`)
+      totalCompatibilityScore = 0;
+    }
+
+      logger.info(`user2 [${user2.name}] -> user1 [${user1.name}] : ${countOfInterestMatches}: [${interestCategoryMatchScore}] {${interestMatched}%} total = ${totalCompatibilityScore}`);
+
+      u2Compat = {
+        _id: user2._id,
+        name: user2.name,
+        target_id: user1._id, 
+        target_name: user1.name,
+        totalCompatibilityScore,
+        age: {
+          ageMatchScore,
+          ageDifference
+        },
+        interestCategory: {
+          interestCategoryMatchScore,
+          countOfInterestCategoryMatches
+        },
+        interest: {
+          interestMatchScore,
+          countOfInterestMatches,
+          interestMatched
+        },
+        locationResultsObject: {
+          distance: matchLocationDistance,
+          score: matchLocationScore
+        }
       }
     } 
 
+    let match = new Match({
+      users: [],
+      compatibilityResults: [
+        u1Compat,
+        u2Compat
+      ],
+    });
+
     match.users.push(user1._id);
     match.users.push(user2._id);
-    match.compatibilityResultsObject.push(compatibilityResultsObject);
-     
+
     return match;
-  },
-
-  /*
-  **  takes an array of pairs in the format : ["id1234-id5678"] and splits to generate an 
-  **  array of match model = ${matchArray}
-  */
-  generateMatchesArray: function generateMatchesArray(pairsArray, usersArray, interestsArray) {
-
-
-    // logger.info(`usersArray length: ${usersArray.length}`)
-    // logger.info(`interestsArray length: ${interestsArray.length}`)
-    // logger.info(`pairsArray length: ${pairsArray.length}`)
-
-
-    let matchesArray = [];
-
-  pairsArray.forEach(users => {
-    // get the user models
-    let user = users.split(/-/);
-    let userProfile1 = findObjectByKey([...usersArray], '_id', user[0]);
-    let userProfile2 = findObjectByKey([...usersArray], '_id', user[1]);
-  
-    // generate the compatibility object for the 2 profiles
-    let match = this.generateMatchModel(userProfile1, userProfile2, interestsArray);
-
-    matchesArray.push(match);
-    
-
-    // update the users matches array if the id does not exist
-
-
-
-    // if( userProfile2.matches.indexOf(user[0]) === -1 ) { 
-      // console.log('2 matches array does not contain this id')
-    // }
-
-
-
-  });
-
-  return matchesArray
-
-
-  },
-
-
+  }
 };

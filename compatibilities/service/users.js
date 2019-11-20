@@ -15,12 +15,16 @@ module.exports = {
     return User.findOne({ _id: userId });
   },
 
+  findOneUserByEmail: function findOneUser(email) {
+    return User.findOne({ "loginCredentials.email": email });
+  },
+
 /*
 **  ${searchQuery} example: { _id: "1234"  } or 
 **                        : { name: "dave" }
 */
-  searchUsers: async function searchUsers(searchQuery) {
-    return await User.find(searchQuery)
+  searchUsers: function searchUsers(searchQuery) {
+    return User.find(searchQuery)
   },
 
 /*
@@ -85,7 +89,7 @@ module.exports = {
   removeMatchesFromUser: async function removeMatchesFromUser(userId, matchesId) {
     const query = {_id : userId};
     const update = { $pull: { matches : matchesId } };
-    const options = {new: true};
+    const options = {new: true, upsert: true};
     return await User.findOneAndUpdate(query, update, options);
   },
 
@@ -99,5 +103,6 @@ module.exports = {
       interests: { $in: interestId }
     });
   }
+
     
 }

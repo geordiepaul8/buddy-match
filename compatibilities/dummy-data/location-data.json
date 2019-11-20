@@ -1,0 +1,32 @@
+[
+  {
+    "latitude":54.977840,
+    "longitude":-1.612920,
+    "city":"Newcastle-Upon-Tyne"
+  },
+  {
+    "latitude":51.506846,
+    "longitude":-0.046563,
+    "city":"London"
+  },
+  {
+    "latitude":53.472403,
+    "longitude":-2.236439,
+    "city":"Manchester"
+  },
+  {
+    "latitude":53.408371,
+    "longitude":-2.991573,
+    "city":"Liverpool"
+  },
+  {
+    "latitude":55.953251,
+    "longitude":-3.188267,
+    "city":"Edinburgh"
+  },
+  {
+    "latitude":51.481312,
+    "longitude":-3.180500,
+    "city":"Cardiff"
+  }
+]

@@ -1,0 +1,139 @@
+<div class="row mb-3">
+  <div class="col-xl-3 col-sm-6 py-2">
+    <div class="card bg-success text-white h-100">
+      <div class="card-body bg-success">
+        <div class="rotate">
+          <i class="fa fa-user fa-4x"></i>
+        </div>
+        <h6 class="text-uppercase">Users</h6>
+        <h1 class="display-4">{{ users?.length }}</h1>
+      </div>
+    </div>
+  </div>
+  <div class="col-xl-3 col-sm-6 py-2">
+    <div class="card text-white bg-danger h-100">
+      <div class="card-body bg-danger">
+        <div class="rotate">
+          <i class="fa fa-cubes fa-4x"></i>
+        </div>
+        <h6 class="text-uppercase">Interests</h6>
+        <h1 class="display-4">{{ interests?.length }}</h1>
+      </div>
+    </div>
+  </div>
+  <div class="col-xl-3 col-sm-6 py-2">
+    <div class="card text-white bg-info h-100">
+      <div class="card-body bg-info">
+        <div class="rotate">
+          <i class="fa fa-arrows-h fa-4x"></i>
+        </div>
+        <h6 class="text-uppercase">Matches <span *ngIf="filterMatch">(Filtered)</span></h6>
+        <h1 class="display-4">{{ matches?.length }}</h1>
+        <button class="btn bt-sm btn-primary" (click)="filterMatches()">Filter</button>
+      </div>
+    </div>
+  </div>
+  <div class="col-xl-3 col-sm-6 py-2">
+    <div class="card text-white bg-warning h-100">
+      <div class="card-body">
+        <div class="rotate">
+          <i class="fa fa-map-marker fa-fw"></i>
+        </div>
+        <h6 class="text-uppercase">Locations</h6>
+        <h1 class="display-4">0</h1>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="row mb-3">
+  <div class="col-xl-3 col-sm-6 py-2">
+    <ul class="list-group">
+      <li *ngFor="let user of users" class="list-group-item" [ngClass]="user?.settings?.isAdmin ? 'list-group-item-success' : ''">
+        <div class="user-card">
+          <span class="user-card-name">
+            <i class="fa fa-user fa-fw"></i>{{ user?.name}}
+            <br>
+            <small class="user-card-name-clickable" (click)="filterMatchByUser(user)">{{ user?._id }}</small>
+          </span>
+          <br>
+          <span class="user-card-metrics">
+            <i class="fa fa-cubes fa-fw"></i>{{ user?.interests?.length }} |
+            <i class="fa fa-arrows-h fa-fw"></i> {{ user?.matches?.length }} |
+            <i class="fa fa-map-marker fa-fw"></i><small> [{{ user?.settings?.searchDistance }}miles] | {{ user?.location?.city }} </small>
+          </span>
+          <br>
+          <span class="button user-card-button">
+            <div *ngIf="filterMatchByName && filteredUser == user?._id" class="btn btn-sm btn-warning" (click)="clearFilterMatches()">Clear</div>
+            <div class="btn btn-sm btn-danger" (click)="deleteUser(user)">X</div>
+          </span>
+        </div>
+      </li>
+    </ul>
+  </div>
+  <div class="col-xl-3 col-sm-6 py-2">
+    <ul class="list-group">
+      <li *ngFor="let interest of interests" class="list-group-item">
+        <div class="user-card">
+          <span class="user-card-name">
+            <i class="fa fa-cubes fa-fw"></i> {{ interest?.name }}
+            <br>
+            <small>{{ interest?._id }}</small>
+          </span>
+          <br>
+          <span class="user-card-metrics">
+              <i class="fa fa-cube fa-fw"></i> {{ interest?.category}} 
+          </span>
+          <br>
+          <span class="button interest-card-button">
+            <div class="btn btn-sm btn-danger" (click)="deleteInterest(interest)">X</div>
+          </span>
+        </div>
+      </li>
+    </ul>
+  </div>
+  <div class="col-xl-3 col-sm-6 py-2">
+    <ul class="list-group">
+      <li *ngFor="let match of matches" class="list-group-item">
+        <div class="user-card card-match">
+          <div class="user-card-match">
+            <span style="color: #5bc0de"><i class="fa fa-arrows-h fa-fw"></i>{{ match?._id }}</span>
+            <br>
+            <i class="fa fa-user fa-fw"></i><small>
+              {{ match?.compatibilityResults[0].name }} [ {{ match?.compatibilityResults[0].target_name }} : {{ match?.compatibilityResults[0].totalCompatibilityScore }}]
+              <i class="fa fa-cube fa-fw"></i> {{ match?.compatibilityResults[0].interestCategory?.countOfInterestCategoryMatches }} | 
+              <i class="fa fa-cubes fa-fw"></i> {{ match?.compatibilityResults[0].interest?.countOfInterestMatches }} ({{ match?.compatibilityResults[0].interest?.interestMatched }}%)|
+              <i class="fa fa-map-marker fa-fw"></i> {{ match?.compatibilityResults[0]?.locationResultsObject?.distance }}miles | <i *ngIf="isDistanceWithinUserParams(match?.compatibilityResults[0]?.locationResultsObject?.distance, match?.compatibilityResults[0]?._id)" class="fa fa-check fa-fw"></i>
+            </small>
+            <br>
+            <i class="fa fa-user fa-fw"></i><small>
+              {{ match?.compatibilityResults[1].name }} [ {{ match?.compatibilityResults[1].target_name }} : {{ match?.compatibilityResults[1].totalCompatibilityScore }}]
+              <i class="fa fa-cube fa-fw"></i> {{ match?.compatibilityResults[1].interestCategory?.countOfInterestCategoryMatches }} | 
+              <i class="fa fa-cubes fa-fw"></i> {{ match?.compatibilityResults[1].interest?.countOfInterestMatches }} ({{ match?.compatibilityResults[1].interest?.interestMatched }}%)|
+              <i class="fa fa-map-marker fa-fw"></i> {{ match?.compatibilityResults[1].locationResultsObject?.distance }}miles | <i *ngIf="isDistanceWithinUserParams(match?.compatibilityResults[1].locationResultsObject?.distance, match?.compatibilityResults[1]._id)" class="fa fa-check fa-fw"></i>
+            </small>
+          </div>
+          <!-- <div class="user-card-score">
+            <p class="total-score">{{ match?.compatibilityScore }}</p>
+          </div> -->
+        </div>
+        <br>
+        <div class="user-card-footer">
+          <!-- <span class="sub-scores sub-scores-map">
+            <p> <i class="fa fa-map-marker fa-fw"></i>{{ match?.locationResultsObject?.distance }}m [ {{ match?.locationResultsObject?.score }}]</p>
+          </span>
+          <span class="sub-scores">
+            <p> <i class="fa fa-user fa-fw"></i>{{ match?.compatibilityResultsObject[0]?.age?.ageMatchScore }}</p>
+          </span>
+          <span class="sub-scores">
+            <p> <i class="fa fa-cube fa-fw"></i>{{
+              match?.compatibilityResultsObject[0]?.interestCategory?.interestCategoryMatchScore }}</p>
+          </span>
+          <span class="sub-scores">
+            <p> <i class="fa fa-cubes fa-fw"></i>{{ match?.compatibilityResultsObject[0]?.interest?.interestMatchScore
+              }}</p>
+          </span> -->
+        </div>
+      </li>
+    </ul>
+  </div>
+</div>

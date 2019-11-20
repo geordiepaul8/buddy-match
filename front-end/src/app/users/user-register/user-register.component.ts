@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { User } from '../user.model';
-import { UserService } from '../users.service';
-import { InterestService } from 'src/app/interests/interest-service';
-import { Interest } from 'src/app/interests/interest.model';
+import { User } from '../../_models/user.model';
+import { UserService } from '../../_services/users.service';
+import { InterestService } from 'src/app/_services/interest-service';
+import { Interest } from 'src/app/_models/interest.model';
 import { FormArray, FormGroup, FormBuilder, FormControl } from '@angular/forms';
 
 @Component({
@@ -10,7 +10,7 @@ import { FormArray, FormGroup, FormBuilder, FormControl } from '@angular/forms';
 	templateUrl: './user-register.component.html',
 	styleUrls: ['./user-register.component.css']
 })
-export class UserRegisterComponent implements OnInit {
+export class UserRegisterComponentold implements OnInit {
 
 	newUser: User;
 	// email: string;
@@ -21,19 +21,15 @@ export class UserRegisterComponent implements OnInit {
 	latitude: string;
 	longitude: string;
 
-userForm: FormGroup;
-email: FormControl;
+	userForm: FormGroup;
+	email: FormControl;
 	
 
 	interestList: Array<Interest>;
 
 	constructor(private userService: UserService, 
 							private interestService: InterestService,
-							private fb: FormBuilder) { 
-
-
-
-	}
+							private fb: FormBuilder) { }
 
 	ngOnInit() {
 		// call the interests
@@ -43,10 +39,6 @@ email: FormControl;
 			console.log(response)
 			this.interestList = response.interest
 		});
-
-		// this.userForm = this.fb.group({
-		// 	userInterests: this.fb.array([])
-		// })
 
 		this.userForm = new FormGroup({
 			email: new FormControl(''),
@@ -68,13 +60,11 @@ email: FormControl;
 			let index = interestFormArray.controls.findIndex(x => x.value == interest);
 			interestFormArray.removeAt(index);
 		}
-
-		console.log(interestFormArray)
 	}
 
 	addUser() {
 
-console.log('add user')
+		console.log('add user')
 		console.log(this.userForm)
 
 		this.newUser = {
@@ -94,7 +84,15 @@ console.log('add user')
 				city: 'My City',
 			},
 			matches: [],
-			interests: this.userForm.value.userInterests
+			interests: this.userForm.value.userInterests,
+			settings: {
+				searchDistance: 50,
+				ageFilter: {
+					isSet: false,
+					min: -1,
+					max: -1
+				},
+			}
 		}
 
 		console.log(this.newUser)
@@ -129,7 +127,15 @@ console.log('add user')
 				city: 'My City',
 			},
 			matches: [],
-			interests: []
+			interests: [],
+			settings: {
+				searchDistance: 50,
+				ageFilter: {
+					isSet: false,
+					min: -1,
+					max: -1
+				},
+			}
 		};
 
 		console.log(`New User:`);

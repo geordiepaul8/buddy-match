@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
-import { InterestService } from '../interest-service';
-import { Interest } from '../interest.model';
+import { InterestService } from '../../_services/interest-service';
+import { Interest } from '../../_models/interest.model';
 
 @Component({
   selector: 'app-interest-list',

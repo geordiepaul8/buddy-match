@@ -1,0 +1,32 @@
+[
+  {
+    "_id": null, 
+    "category": "sport",
+    "name": "playing football"
+  },
+  {
+    "_id": null, 
+    "category": "art",
+    "name": "painting"
+  },
+  {
+    "_id": null, 
+    "category": "leisure",
+    "name": "hill walking"
+  },
+  {
+    "_id": null,
+    "category": "literature",
+    "name": "reading fiction novels"
+  },
+  {
+    "_id": null,
+    "category": "gaming",
+    "name": "playing online games"
+  },
+  {
+    "_id": null,
+    "category": "leisure",
+    "name": "pub quiz"
+  }
+]

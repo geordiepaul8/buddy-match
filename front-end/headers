@@ -1,0 +1,11 @@
+HTTP/1.1 200 OK
+X-Powered-By: Express
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Headers: X-Requested-With, Content-Type, Authorization
+Access-Control-Allow-Methods: GET, PUT, POST, PATCH, DELETE
+Content-Type: application/json; charset=utf-8
+Content-Length: 1509
+ETag: W/"5e5-dF9SpEHKUTkBi3b/gKnXS0oALxc"
+Date: Wed, 06 Nov 2019 12:39:33 GMT
+Connection: keep-alive
+

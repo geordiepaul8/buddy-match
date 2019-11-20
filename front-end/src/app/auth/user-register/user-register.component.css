@@ -1,0 +1,10 @@
+h2, h5 {
+  color: blue;
+  margin: 0 auto;
+  text-align: center !important;
+  padding-bottom: 5px;
+}
+
+.extra-padding-bottom {
+  padding-bottom: 25px;
+}

@@ -4,15 +4,15 @@ module.exports = {
 /*
 **  find all interests in the collection 'interests'
 */
-  findAllInterests: async function findAllInterests() {
-    return await Interest.find({})
+  findAllInterests: function findAllInterests() {
+    return Interest.find({})
   },
 
 /*
 **  ${interest} = Interest model
 */
   createInterest: async function createInterest(interest) {
-    return await interest.save();
+    return await interest.save()
   },
 
 /*
@@ -21,7 +21,4 @@ module.exports = {
   deleteInterest: async function deleteInterest(interestId) {
     return await Interest.findOneAndRemove({ _id: interestId });
   }
-
-
-
 }

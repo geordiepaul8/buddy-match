@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { Interest } from '../interest.model';
-import { InterestService } from '../interest-service';
+import { Interest } from '../../_models/interest.model';
+import { InterestService } from '../../_services/interest-service';
 
 @Component({
   selector: 'app-interest-add',

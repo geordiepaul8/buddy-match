@@ -1,91 +1,105 @@
-<div class="container-fluid">
-  <div class="row">
-    <div class="col">
-      <h5>Profile</h5>
-      <div class="card">
-        <div class="card-header">
-          <h5 class="card-title">{{ loggedInUser?.name}}</h5>
-          <h6 class="card-subtitle mb-2 text-muted">{{ loggedInUser?._id }}</h6>
-          <h6 class="card-subtitle mb-2 text-muted">{{loggedInUser?.loginCredentials?.email}}</h6>
-        </div>
-        <div class="card-body">
-          <p class="card-text">Age: {{ loggedInUser?.age }}</p>
-          <h5 class="card-title">Location Details</h5>
-          <ul class="card-text">
-            <li>Position: {{loggedInUser?.location?.latitude }} / {{loggedInUser?.location?.longitude }}</li>
-            <li>City: {{loggedInUser?.location?.city }}</li>
-          </ul>
-          <h5 class="card-title">Interests</h5>
-          <ul class="card-text">
-            <li *ngFor="let interest of loggedInUser?.interests">{{ interest.name }}</li>
-          </ul>
-          <br>
-          <hr>
-          <a href="#" class="card-link">Change password</a>
-          <a href="#" class="card-link">Interests</a>
-          <a href="#" class="card-link">Settings</a>
-        </div>
-        <div class="card-footer text-muted">
-          Last Updated: {{ loggedInUser?.updatedAt }}
-          <hr>
-          <h5>Your settings</h5>
-          <ul>
-            <li>Want to be searched? Y/N</li>
-            <li>Distance for match: Default is 50nm (same country only)</li>
-            <li>Distance that searchees can look for you</li>
-            <li>notifications on events that match you in your location?</li>
-          </ul>
-        </div>
+<div class="row">
+  <div class="col">
+    <h5>Profile</h5>
+    <div class="card">
+      <div class="card-header">
+        <h5 class="card-title"><i class="fa fa-user fa-fw"></i> {{ currentUser?.name}}</h5>
+        <h6 class="card-subtitle mb-2 text-muted">{{ currentUser?._id }}</h6>
+        <h6 class="card-subtitle mb-2 text-muted">{{currentUser?.loginCredentials?.email}}</h6>
+        <h6 class="card-title">{{ currentUser?.age }} years old</h6>
+      </div>
+      <div class="card-body">
+        <h5 class="card-title"><i class="fa fa-map-marker fa-fw"></i> Location Details</h5>
+        <ul class="card-text">
+          <li>Position: {{currentUser?.location?.latitude }} / {{currentUser?.location?.longitude }}</li>
+          <li>City: {{currentUser?.location?.city }}</li>
+        </ul>
+        <hr>
+        <h5 class="card-title"><i class="fa fa-cubes fa-fw"></i> Interests: {{ currentUser?.interests.length }}</h5>
+        <ul class="card-text">
+          <span *ngFor="let userInterest of currentUser?.interests">
+            <span *ngFor="let interest of interestList">
+              <li *ngIf="userInterest === interest?._id">
+                <button class="btn btn-sm btn-danger" (click)="removeInterest(userInterest)">X</button>
+                [{{ interest.category }}] {{ interest.name }}
+              </li>
+            </span>
+          </span>
+        </ul>
+        <hr>
+        <h5 class="card-title"><i class="fa fa-arrows-h fa-fw"></i> # of possible matches: {{ userMatchesList?.length }}</h5>
+        <h5 class="card-title"><i class="fa fa-arrows-h fa-fw"></i> # of scored matches: {{ filteredUserMatchesList?.length }}</h5>
+        <hr>
+        <h5 class="card-title">Your Events Listed: 0 </h5>
+        <hr>
+        <h5 class="card-title">Your Events Subscribed to: 0 </h5>
+        <hr>
+        <h5 class="card-title">Your Events Listening to: 0 </h5>
+        <hr>
+        <a href="#" class="card-link">Change password</a>
+        <a href="#" class="card-link">Interests</a>
+        <a href="#" class="card-link">Settings</a>
+      </div>
+      <div class="card-footer text-muted">
+        Last Updated: {{ currentUser?.updatedAt }}
+        <hr>
+        <h5>Your settings</h5>
+        <ul>
+          <li>Want to be searched? Y/N</li>
+          <li>Distance for match: Default is 50nm (same country only)</li>
+          <li>Distance that searchees can look for you</li>
+          <li>notifications on events that match you in your location?</li>
+        </ul>
       </div>
     </div>
-    <div class="col">
-      <h5>Matches</h5>
-      <ul>
-        <!-- | orderBy: '-match.compatibilityScore' -->
-        <li *ngFor="let match of loggedInUser?.matches">
-          <div [ngClass]="match?.compatibilityScore !== 0 ? 'alert-info' : 'alert-danger'" 
-              class="alert">
-            <!-- <p>{{ match?._id }}</p> -->
-            <span *ngFor="let u of userMatchesList">
+  </div>
+  <div class="col">
+    <h5>Matches</h5>
+    <ul>
+      <!-- | orderBy: '-match.compatibilityScore' -->
+      <li *ngFor="let match of filteredUserMatchesList">
+        <div [ngClass]="match?.compatibilityScore !== 0 ? 'alert-info' : 'alert-danger'" class="alert">
+          <span *ngFor="let u of userList">
+            <span *ngIf="u?._id !== currentUser?._id">
               <strong>
-                <h5 *ngIf="match?.users.indexOf(u?._id) > -1">{{ u?.name }} : [{{ match?.compatibilityScore }}]</h5>
+                <!-- <i class="fa fa-superpowers" aria-hidden="true"></i> -->
+                <span *ngIf="match?.users.indexOf(u?._id) > -1">
+                  <p>{{ u?.name }} : [<i class="fa fa-bullseye" aria-hidden="true"></i> {{ (match?.compatibilityScore /
+                    maxMatchScore) * 100 }}% matched]</p>
+                  <p></p>
+                </span>
               </strong>
             </span>
-            <p></p>
-            <p>breakdown:</p>
-            <div class="row">
-              <div class="col"></div>
-              <div class="col">Scores</div>
-              <div class="col">Count</div>
-
-            </div>
-            <div class="row">
-
-              <div class="col">
-                <p>age</p>
-                <p>interests</p>
-                <p>categories</p>
-                <p>Location</p>
-              </div>
-              <div class="col">
-                <!-- scores -->
-                <p>{{ match?.compatibilityResultsObject[0].age.ageMatchScore }}</p>
-                <p>{{ match?.compatibilityResultsObject[0].interest.interestMatchScore }} </p>
-                <p>{{ match?.compatibilityResultsObject[0].interestCategory.interestCategoryMatchScore }} </p>
-              </div>
-              <div class="col">
-                <!-- counts -->
-                <p>-</p>
-                <p>{{ match?.compatibilityResultsObject[0].interest.countOfInterestMatches }} </p>
-                <p>{{ match?.compatibilityResultsObject[0].interestCategory.countOfInterestCategoryMatches }} </p>
-              </div>
-            </div>
-
-
+          </span>
+          <div class="row">
+            <div class="col"></div>
+            <div class="col">Scores</div>
+            <div class="col">Count</div>
           </div>
-        </li>
-      </ul>
-    </div>
+          <div class="row">
+            <div class="col">
+              <p><i class="fa fa-user" aria-hidden="true"></i> age</p>
+              <p><i class="fa fa-cube" aria-hidden="true"></i> categories</p>
+              <p><i class="fa fa-cubes" aria-hidden="true"></i> interests</p>
+              <p><i class="fa fa-map-marker" aria-hidden="true"></i> Location</p>
+            </div>
+            <div class="col">
+              <!-- scores -->
+              <p>{{ match?.compatibilityResultsObject[0]?.age?.ageMatchScore }}</p>
+              <p>{{ match?.compatibilityResultsObject[0]?.interestCategory?.interestCategoryMatchScore }} </p>
+              <p>{{ match?.compatibilityResultsObject[0]?.interest?.interestMatchScore }} </p>
+              <p>{{ match?.locationResultsObject?.score }} </p>
+            </div>
+            <div class="col">
+              <!-- counts -->
+              <p>-</p>
+              <p>{{ match?.compatibilityResultsObject[0].interestCategory.countOfInterestCategoryMatches }} </p>
+              <p>{{ match?.compatibilityResultsObject[0].interest.countOfInterestMatches }} </p>
+              <p>{{ match?.locationResultsObject?.distance }} miles </p>
+            </div>
+          </div>
+        </div>
+      </li>
+    </ul>
   </div>
-  <br>
 </div>

@@ -13,10 +13,7 @@ const isValidObjectId = require('./../utils/is-valid-object-id');
 const interestMatch = require('./../utils/interest-match');
 const areUsersMatchedAlready = require('./../utils/are-users-matched-already');
 // logger
-const pino = require('pino')
-const logger = pino({
-  prettyPrint: { colorize: true }
-})
+const logger = require('./logger');
 
 //TODO: all catch will return FALSE
 module.exports = async (userId) => {

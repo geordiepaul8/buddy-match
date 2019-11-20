@@ -1,9 +1,9 @@
 <ul class="list-group list-group-flush">
     <!-- *ngIf="userList?.length < 1" -->
-    <div class="alert alert-primary">There are {{ userList?.length }} members stored</div>
+    <div class="alert alert-primary">There are {{ users?.length }} members stored</div>
     <li [ngClass]="user.loginMetrics.isLoggedIn ? 'loggedIn' : 'loggedOut'"
         class="list-group-item d-flex justify-content-between align-items-center" 
-        *ngFor="let user of userList">
+        *ngFor="let user of users">
         <div>
             <span style="float: left" class="badge badge-primary badge-pill">interests: {{user?.interests.length}}</span>
             <span style="float: left" class="badge badge-primary badge-pill">matches: {{user?.matches.length}}</span>

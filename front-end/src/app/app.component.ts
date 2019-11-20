@@ -1,5 +1,5 @@
-import { Component, Input } from '@angular/core';
-import { User } from './users/user.model';
+import { Component } from '@angular/core';
+
 @Component({
 	selector: 'app-root',
 	templateUrl: './app.component.html',
@@ -8,15 +8,5 @@ import { User } from './users/user.model';
 export class AppComponent {
 	title = 'front-end';
 
-	user: User;
-	loggedInUser: string;
-
-	setLoggedInUser(emittedUser) {
-		// console.log('user: ' + loggedInUser);
-		if (emittedUser) {
-			this.user = emittedUser;
-			this.loggedInUser = emittedUser.name;
-		}
-
-	}
+	constructor() {}
 }

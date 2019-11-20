@@ -1,7 +1,12 @@
 import { Component, OnInit, Output,  EventEmitter } from '@angular/core';
-import { UserService } from './../users.service';
 
-import { User } from './../user.model';
+import { Subscription } from 'rxjs';
+import { first } from 'rxjs/operators';
+
+import { UserService } from '../../_services/users.service';
+import { AuthenticationService } from '../../_services/auth.service';
+
+import { User } from '../../_models/user.model';
 
 
 @Component({
@@ -13,35 +18,36 @@ export class UserListComponent implements OnInit {
 
 	userList: Array<User>;
 	message: string;
+
+
+	currentUser: User;
+	currentUserSubscription: Subscription;
+	users: User[] = [];
 	
 	@Output() newUserLogin = new EventEmitter<User>();
 
-	constructor(private userService: UserService) { }
+	constructor(
+		private authenticationService: AuthenticationService,
+		private userService: UserService
+		) { 
+			this.currentUserSubscription = this.authenticationService.currentUser.subscribe(user => {
+				this.currentUser = user;
+			});
+		}
 
 	ngOnInit() {
-		this.userService.getAllUsers()
-		.subscribe((allUsersResponse) => {
-			console.log(allUsersResponse);
-			this.message = allUsersResponse.message;
-			this.userList = allUsersResponse.users;
-			// make the first user back in the list the logged in user for now
-			this.userService.changeLogInUser(allUsersResponse.users[0]);
-		});
+		this.loadAllUsers();
 	}
 
-	changeLoginStatus(user: User) {
-		console.log(`calling login service: ${user.name}`);
-	
-		this.userService.changeLoginStatus(user)
-		.subscribe((response) => {
-			console.log(response)
-		});
-		user.loginMetrics.isLoggedIn = !user.loginMetrics.isLoggedIn;
+	ngOnDestroy() {
+		// unsubscribe to ensure no memory leaks
+		this.currentUserSubscription.unsubscribe();
 	}
 
-	logInUser(user: User) {
-		console.log(`calling service: ${user.name}`);
-		this.userService.changeLogInUser(user)
+	private loadAllUsers() {
+		this.userService.getAllUsers().pipe(first()).subscribe(response => {
+			this.users = response.users;
+		})
 	}
 
 	
@@ -61,7 +67,7 @@ export class UserListComponent implements OnInit {
 		})
 
 		console.log('calling delete user service')
-		this.userService.deleteUser(user)
+		this.userService.deleteUser(user._id)
 		.subscribe((response) => {
 			console.log(response)
 			this.userList.splice(this.userList.indexOf(user), 1);

@@ -12,7 +12,8 @@ COPY package-lock.json /front-end/package-lock.json
 
 RUN apk add --update git
 
-RUN npm ci --verbose
+# RUN npm update
+RUN npm ci
 RUN npm install -g @angular/cli
 
 # add front-end

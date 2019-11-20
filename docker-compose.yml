@@ -1,7 +1,36 @@
 version: "3"
 services:
-  app:
-    container_name: app
+  data-loader:
+    container_name: data-loader
+    depends_on:
+      - server
+    image: alpine
+    entrypoint: /dummy-data/load-data.sh
+    volumes:  
+      - ./compatibilities/dummy-data:/dummy-data/
+    environment:
+      - SERVER_PORT=3000
+      - SERVER_HOST=server
+  consumer-server:
+    container_name: consumer-server
+    restart: always
+    build: ./consumer-server/
+    ports:
+      - "6100:6100"
+    environment:
+      - APP_PORT=6100
+      - MONGO_PORT=27017
+      - MONGO_HOST=mongo
+      - MONGO_DB=MyDb
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - RABBIT_USER=user
+      - RABBIT_PASS=user
+      - RABBIT_VHOST=vhost
+      - RABBIT_PORT=5672
+      - RABBIT_HOST=rabbitmq
+  server:
+    container_name: server
     restart: always
     build: ./compatibilities/
     ports:
@@ -11,17 +40,30 @@ services:
       - MONGO_PORT=27017
       - MONGO_HOST=mongo
       - MONGO_DB=MyDb
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - SET_AUTH=true
+      - USE_TLS=
+      - AUTH_KEY="my-really-long-secret-key_that_no_one-can-get-to"
+      - RABBIT_USER=user
+      - RABBIT_PASS=user
+      - RABBIT_VHOST=vhost
+      - RABBIT_PORT=5672
+      - RABBIT_HOST=rabbitmq
     links:
       - mongo
     depends_on:
+      - rabbitmq
       - mongo
+      - redis
+
   mongo:
     container_name: mongo
     image: mongo:4.0.5
     ports:
       - "27017:27017"
-    # volumes:
-    #   - ./../docker-volumes/data:/data/db
+    volumes:
+      - ./data/mongo:/data/db
   angular:
     container_name: angular
     restart: always
@@ -29,4 +71,31 @@ services:
     ports:
       - "4200:4200"
     depends_on:
-      - app
+      - server
+  redis:
+    container_name: redis
+    image: redis:alpine3.10
+    ports:
+        - "6379:6379"
+    depends_on:
+      - mongo
+  rabbitmq:
+    container_name: rabbitmq
+    image: 'rabbitmq:3.6.6-management'
+    ports:
+      - "4369:4369"
+      - "5672:5672"
+      - "15672:15672"
+      - "25672:25672"
+      - "35197:35197"
+    volumes:
+      - ./data/mq:/var/lib/rabbitmq
+      - ./data/mq/logs:/var/log/rabbitmq
+    hostname: rabbit
+    environment:
+      - RABBITMQ_DEFAULT_USER=user
+      - RABBITMQ_DEFAULT_PASS=user
+      - RABBITMQ_DEFAULT_VHOST=vhost
+volumes:
+  jenkins_data:
+    driver: local

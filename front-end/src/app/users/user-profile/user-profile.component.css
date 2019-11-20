@@ -1,3 +1,11 @@
-.zeroScore: {
-  
+.fa-map-marker {
+  color: #f0ad4e;
+}
+
+.fa-cube, .fa-cubes {
+  color: #d9534f;
+}
+
+.fa-user {
+  color: #5cb85c;
 }

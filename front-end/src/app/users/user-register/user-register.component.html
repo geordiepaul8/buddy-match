@@ -1,55 +1,61 @@
+<style>
+	.col {
+		border: 1px solid red;;
+	}
+</style>
+
 <form [formGroup]="userForm">
-<div class="form-group">
-		<label for="email">Email address</label>
-		<input type="email" 
-					class="form-control" 
-					placeholder="Enter email"
-					formControlName="email">
-	</div>
-<div class="form-group">
-		<label for="password">Password</label>
-		<input type="password" 
-					class="form-control"
-					placeholder="Password"
-					formControlName="password">
-	</div>
-	<div class="form-group">
-		<label for="name">Name</label>
-		<input type="text" class="form-control" placeholder="Your Full Name"
-						formControlName="name">
-	</div>
-	<div class="form-group">
-		<label for="age">Age</label>
-		<input type="number" class="form-control" placeholder="YourAge"
-					formControlName="age">
-	</div>
+	<div class="row">
+		<div class="col">
+			<div class="form-group">
+				<label for="email">Email address</label>
+				<input type="email" class="form-control" placeholder="Enter email" formControlName="email">
+			</div>
+			<div class="form-group">
+				<label for="password">Password</label>
+				<input type="password" class="form-control" placeholder="Password" formControlName="password">
+			</div>
+			<div class="form-group">
+				<label for="name">Name</label>
+				<input type="text" class="form-control" placeholder="Your Full Name" formControlName="name">
+			</div>
+			<div class="form-group">
+				<label for="age">Age</label>
+				<input type="number" class="form-control" placeholder="YourAge" formControlName="age">
+			</div>
 
-	<br>
-	<div class="form-group">
-		<input type="text" formControlName="latitude" />
-	</div>
-	<div class="form-group">
-		<input type="text" formControlName="longitude" />
-	</div>
-	<hr>
-	<h5>Add Interests</h5>
-	<br>
-	<div *ngFor="let interest of interestList; let i = index" class="row">
-		<div class="form-check">
-			<input class="form-check-input" type="checkbox" 
-						(change)="onChangeInterest(interest._id, $event.target.checked)">
+			<br>
+			<div class="form-group">
+				<input type="text" formControlName="latitude" />
+			</div>
+			<div class="form-group">
+				<input type="text" formControlName="longitude" />
+			</div>
 
-			<label class="form-check-label" for="defaultCheck1">
-				{{interest?.category}} : {{ interest?.name }}
-			</label>
+	</div>
+		<div class="col">
+			<h5>Add Interests</h5>
+			<br>
+			<div *ngFor="let interest of interestList; let i = index" class="row">
+				<div class="form-group">
+					<div class="form-check">
+						<input class="form-check-input" type="checkbox" (change)="onChangeInterest(interest._id, $event.target.checked)">
+
+						<label class="form-check-label" for="defaultCheck1">
+							{{interest?.category}} : {{ interest?.name }}
+						</label>
+					</div>
+				</div>
+				<br>
+			</div>
 		</div>
-		<br>
+
+
 	</div>
 
-	<br>
-	<hr>
-	<br>
+	<div class="row">
+		<button type="submit" class="btn btn-primary" (click)="addUser()">Submit</button>
 
+	</div>
 
-	<button type="submit" class="btn btn-primary" (click)="addUser()">Submit</button>
 </form>
