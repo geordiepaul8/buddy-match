@@ -20,7 +20,7 @@
     "npm": "^6.13.0",
     "pino": "^5.12.6",
     "pino-pretty": "^3.2.0",
-    "redis": "^2.8.0",
+    "redis": "^3.1.1",
     "request": "^2.88.0"
   },
   "devDependencies": {
